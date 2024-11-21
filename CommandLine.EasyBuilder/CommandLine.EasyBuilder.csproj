@@ -8,8 +8,8 @@
     <Nullable>disable</Nullable>
     <RootNamespace>CommandLine.EasyBuilder</RootNamespace>
     <Authors>Nicholas Petersen</Authors>
-    <RepositoryUrl>https://github.com/copernicus365/System.CommandLine.EasyBuilder</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/copernicus365/System.CommandLine.EasyBuilder</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/copernicus365/CommandLine.EasyBuilder</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/copernicus365/CommandLine.EasyBuilder</PackageProjectUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>System.CommandLine, simple, functional, builder</PackageTags>
