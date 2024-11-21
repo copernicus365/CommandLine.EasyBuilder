@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>CommandLine.EasyBuilder</RootNamespace>
+    <Authors>Nicholas Petersen</Authors>
+    <RepositoryUrl>https://github.com/copernicus365/System.CommandLine.EasyBuilder</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/copernicus365/System.CommandLine.EasyBuilder</PackageProjectUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>System.CommandLine, simple, functional, builder</PackageTags>
+    <PackageReleaseNotes />
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <Description>Minimal extensions to the System.CommandLine library that allow a more functional way of building a command line app: visually easier to comprehend, and more DRY</Description>
+    <NoWarn>1701;1702;1591;</NoWarn>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" PackagePath="\" Pack="True" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+  </ItemGroup>
+
+</Project>

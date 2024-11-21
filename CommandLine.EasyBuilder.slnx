@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="CommandLine.EasyBuilder\CommandLine.EasyBuilder.csproj" />
+  <Project Path="EasyBuilder.SampleConsoleApps\EasyBuilder.Samples.csproj" />
+</Solution>
