@@ -5,27 +5,27 @@ using CommandLine.EasyBuilder.Private;
 
 namespace CommandLine.EasyBuilder.Auto;
 
-public record OptPropGroup(Type propertyType, PropertyInfo pi, OptionAttribute attr, Option option, object defVal);
+public record AutoPropGroup(Type propertyType, PropertyInfo pi, OptionAttribute attr, Option option, object defVal);
 
 public class OptionsClassConverter
 {
 	static readonly Type OptAttrTyp = typeof(OptionAttribute);
 
-	public static ControlAttribute GetControlAttr2(IControl control) //where T : IControl
-		=> control.GetType().GetCustomAttributes(typeof(ControlAttribute), true).FirstOrDefault() as ControlAttribute;
-
 	public static ControlAttribute GetControlAttr<T>()
 		=> typeof(T).GetCustomAttributes(typeof(ControlAttribute), true).FirstOrDefault() as ControlAttribute;
 
-	public static OptPropGroup[] GetAttributeProps<T>() where T : class, new()
+	public static AutoPropGroup[] GetAttributeProps<T>(out ControlAttribute cntAttr) where T : class, new()
 	{
 		Type type = typeof(T);
+		cntAttr = null;
 
 		PropertyInfo[] props = type.GetProperties();
 		if(props.IsNulle())
 			return null;
 
-		OptPropGroup[] ogroup = props
+		cntAttr = GetControlAttr<T>();
+
+		AutoPropGroup[] ogroup = props
 			.Select(pi => {
 				if(pi.GetCustomAttribute(OptAttrTyp, true) is not OptionAttribute attr)
 					return null;
@@ -42,7 +42,7 @@ public class OptionsClassConverter
 
 				//opt.Name = attr.Name;
 				//opt.Description = attr.Description;
-
+				
 				if(attr.Alias.NotNulle())
 					opt.AddAlias(attr.Alias);
 
@@ -50,10 +50,10 @@ public class OptionsClassConverter
 				if(propTyp.IsValueType)
 					defVal = Activator.CreateInstance(propTyp);
 
-				//if(attr.DefVal != null && !attr.DefVal.Equals(defVal))
-				//	defVal = attr.DefVal;
+				if(attr.DefVal != null && defVal != null && !attr.DefVal.Equals(defVal))
+					opt.SetDefaultValue(attr.DefVal);
 
-				OptPropGroup vv = new(propTyp, pi, attr, opt, defVal);
+				AutoPropGroup vv = new(propTyp, pi, attr, opt, defVal);
 				return vv;
 			})
 			.Where(v => v != null)

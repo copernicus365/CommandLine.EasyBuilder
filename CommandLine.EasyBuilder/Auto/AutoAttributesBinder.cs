@@ -5,13 +5,15 @@ using CommandLine.EasyBuilder.Private;
 
 namespace CommandLine.EasyBuilder.Auto;
 
-public class OptionsAttrBinder<T> : BinderBase<T> where T : class, new()
+public class AutoAttributesBinder<T> : BinderBase<T> where T : class, new()
 {
-	public readonly OptPropGroup[] Props;
+	public readonly AutoPropGroup[] Props;
+	public readonly ControlAttribute ControlAttr;
 
-	public OptionsAttrBinder()
+	public AutoAttributesBinder()
 	{
-		Props = OptionsClassConverter.GetAttributeProps<T>();
+		Props = OptionsClassConverter.GetAttributeProps<T>(out ControlAttr);
+
 		if(Props.IsNulle())
 			throw new ArgumentException("Type if invalid, no attributes / properties found");
 	}
@@ -21,7 +23,7 @@ public class OptionsAttrBinder<T> : BinderBase<T> where T : class, new()
 		T item = new();
 
 		for(int i = 0; i < Props.Length; i++) {
-			OptPropGroup p = Props[i];
+			AutoPropGroup p = Props[i];
 			Option opt = p.option;
 			OptionAttribute attr = p.attr;
 

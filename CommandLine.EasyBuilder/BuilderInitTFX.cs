@@ -8,28 +8,25 @@ namespace CommandLine.EasyBuilder;
 
 public static class BuilderInitTFX
 {
-	public static Command InitCommand<T>(
-		this T control, //IValueDescriptor<T> symbol1,
-		Action<T> handle,
-		Command parentCmd = null) where T : class, IControl, new()
+	public static Command AddCommand<T>(
+		this Command parentCmd,
+		Action<T> handle) where T : class, new()
 	{
-		ControlAttribute cattr = OptionsClassConverter.GetControlAttr2(control)
-			?? throw new ArgumentException();
+		AutoAttributesBinder<T> binder = new();
 
-		Command cmd = new(name: cattr.Name, description: cattr.Description);
+		AutoPropGroup[] arr = binder.Props;
+		ControlAttribute cntAttr = binder.ControlAttr;
 
-		if(cattr.Alias != null) {
-			cmd.Alias(cattr.Alias);
+		Command cmd = new(name: cntAttr.Name, description: cntAttr.Description);
 
-			if(cattr.Alias2 != null)
-				cmd.Alias(cattr.Alias2);
+		if(cntAttr.Alias != null) {
+			cmd.Alias(cntAttr.Alias);
+
+			if(cntAttr.Alias2 != null)
+				cmd.Alias(cntAttr.Alias2);
 		}
 
-		OptionsAttrBinder<T> binder = new();
-
-		OptPropGroup[] arr = binder.Props;
-
-		foreach(OptPropGroup p in arr)
+		foreach(AutoPropGroup p in arr)
 			AddVal(cmd, p.option);
 
 		Handler.SetHandler(cmd, handle, binder);

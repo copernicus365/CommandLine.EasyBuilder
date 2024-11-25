@@ -4,7 +4,7 @@ using CommandLine.EasyBuilder.Auto;
 namespace EasyBuilder.Samples.Test1;
 
 [Control(Name = "dude", Alias = "p", Description = "Coolio a person man...")]
-public class Duder : IControl
+public class PersonArgs
 {
 	[Option(Name = "--first-name", Alias = "-fn", Required = true, Description = "Person's first name")]
 	public string FirstName { get; set; }
@@ -20,7 +20,6 @@ public class Duder : IControl
 
 	[Option(Name = "--nada-n", Description = "Ignore...")]
 	public double NadaN { get; set; }
-
 
 	[Option(Name = "--durations", Alias = "-durs", Description = "Person's age", Required = true)]
 	public string DurationsArg {

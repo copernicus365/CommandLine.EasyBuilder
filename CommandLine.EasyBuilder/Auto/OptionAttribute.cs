@@ -6,8 +6,8 @@ public class OptionAttribute : BaseValueDescriptorAttribute { }
 
 public class ArgumentAttribute : BaseValueDescriptorAttribute { }
 
-public class ControlAttribute : BaseValueDescriptorAttribute //, IControl
-{ }
+public class ControlAttribute : BaseValueDescriptorAttribute { } //, IControl
+
 
 public class BaseValueDescriptorAttribute : Attribute
 {
@@ -23,10 +23,3 @@ public class BaseValueDescriptorAttribute : Attribute
 
 	public string Alias2 { get; set; }
 }
-
-//public class OptionAttribute<T> : OptionAttribute
-//{
-//	public T DefaultValue { get; set; }
-//	public ParseArgument<T> Parse3 { get; set; }
-//	public Func<ArgumentResult, double[]> Parse { get; set; }
-//}

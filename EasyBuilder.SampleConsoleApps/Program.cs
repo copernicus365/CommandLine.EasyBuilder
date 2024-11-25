@@ -19,7 +19,7 @@ class Program
 			1 => new ExampleApp1(appDescription).GetApp(getNew),
 			2 => new ExampleApp2(appDescription).GetApp(getNew),
 			3 => new ExampleApp3(appDescription).GetApp(getNew),
-			4 => new ExampleApp4(appDescription).GetApp(),
+			4 => new ExampleApp4_Poco(appDescription).GetApp(),
 			_ => throw new ArgumentOutOfRangeException(),
 		};
 
