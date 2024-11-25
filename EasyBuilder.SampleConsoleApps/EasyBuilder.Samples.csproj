@@ -17,7 +17,7 @@
     <PackageReference Include="DotNetXtensions" Version="4.3.0" />
     <PackageReference Include="DotNetXtensions.Json" Version="3.5.0" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
-    <!--<PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta4.22272.1" />-->
+    <PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta2.21617.1" />
   </ItemGroup>
 
   <ItemGroup>
