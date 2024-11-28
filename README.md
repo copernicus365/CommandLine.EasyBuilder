@@ -4,3 +4,6 @@ Minimal extensions to the System.CommandLine library that allow a more functiona
 
 See test project for now for examples.
 
+## Auto Examples
+
+

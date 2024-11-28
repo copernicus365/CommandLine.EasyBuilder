@@ -38,6 +38,7 @@ public class ExampleApp3(string appDescription)
 				name: "--delay",
 				description: "Delay between lines, specified as milliseconds per character in a line.",
 				getDefaultValue: () => 42)
+				.Alias("-deb")
 				.Alias("-d"),
 			new Option<ConsoleColor>(
 				name: "--fgcolor",
@@ -99,7 +100,8 @@ public class ExampleApp3(string appDescription)
 			description: "Delay between lines, specified as milliseconds per character in a line.",
 			getDefaultValue: () => 42);
 		delayOption.AddAlias("-d");
-
+		
+		
 		Option<ConsoleColor> fgcolorOption = new(
 			name: "--fgcolor",
 			description: "Foreground color of text displayed on the console.",

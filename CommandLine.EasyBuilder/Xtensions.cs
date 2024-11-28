@@ -41,4 +41,7 @@ internal static class Xtensions
 
 	internal static bool IsNulle<T>(this T[] arr)
 		=> arr == null || arr.Length == 0;
+
+	internal static bool NotNulle<T>(this T[] arr)
+		=> arr != null && arr.Length > 0;
 }

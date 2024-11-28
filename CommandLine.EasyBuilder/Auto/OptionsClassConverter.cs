@@ -1,64 +1,200 @@
+using System;
 using System.CommandLine;
+using System.CommandLine.Parsing;
 using System.Reflection;
+using System.Runtime.ConstrainedExecution;
 
 using CommandLine.EasyBuilder.Private;
 
 namespace CommandLine.EasyBuilder.Auto;
 
-public record AutoPropGroup(Type propertyType, PropertyInfo pi, OptionAttribute attr, Option option, object defVal);
-
 public class OptionsClassConverter
 {
 	static readonly Type OptAttrTyp = typeof(OptionAttribute);
 
-	public static ControlAttribute GetControlAttr<T>()
-		=> typeof(T).GetCustomAttributes(typeof(ControlAttribute), true).FirstOrDefault() as ControlAttribute;
+	public static CommandAttribute GetControlAttr<T>()
+		=> typeof(T).GetCustomAttributes(typeof(CommandAttribute), true).FirstOrDefault() as CommandAttribute;
 
-	public static AutoPropGroup[] GetAttributeProps<T>(out ControlAttribute cntAttr) where T : class, new()
+	public static object GetHandleMethod<TAuto>(AutoInfo info)
+	{
+		Type type = typeof(TAuto);
+
+		MethodInfo method = type.GetMethod("Handle");
+		if(method == null) {
+			method = type.GetMethod("HandleAsync");
+			if(method == null)
+				return null;
+		}
+
+		bool isVoidRetType = method.ReturnType == typeof(void);
+
+		object _handle = null;
+
+		if(isVoidRetType) {
+			Action<TAuto> handle = (TAuto v) => {
+				info.Method.Invoke(v, null);
+			};
+			_handle = handle;
+		}
+		else {
+			Func<TAuto, Task> handle = async (TAuto v) => {
+				Task<TAuto> result = (Task<TAuto>)info.Method.Invoke(v, null);
+				await result;
+			};
+			_handle = handle;
+		}
+
+		info.SetHandle(method, !isVoidRetType, _handle);
+		return _handle;
+
+		//object target = null;
+		//if(isVoidRetType) {
+		//	//Delegate.CreateDelegate(typeof(Action), new Handler(), eventHandler);
+		//	var h0 = method.CreateDelegate(typeof(Action), target: target);
+		//	//Action action = (Action)MethodInfo.CreateDelegate(typeof(Action), target, method);
+		//	var h1 = (Action)method.CreateDelegate(typeof(Action), target: target);
+		//}
+		//else {
+		//	var h2 = (Func<Task>)method.CreateDelegate(typeof(Func<Task>), target: target);
+		//}
+	}
+
+	public static AutoInfo GetAutoInfoOrThrow<T>() where T : class, new()
+	{
+		AutoInfo info = GetAutoInfo<T>();
+		if(info == null || info.NoProperties)
+			throw new ArgumentException("Type if invalid, no attributes / properties found");
+		return info;
+	}
+
+	public static AutoInfo GetAutoInfo<T>() where T : class, new()
 	{
 		Type type = typeof(T);
-		cntAttr = null;
 
 		PropertyInfo[] props = type.GetProperties();
 		if(props.IsNulle())
 			return null;
 
-		cntAttr = GetControlAttr<T>();
+		AutoInfo info = new() {
+			TType = type,
+			Command = GetControlAttr<T>(),
+		};
 
 		AutoPropGroup[] ogroup = props
 			.Select(pi => {
-				if(pi.GetCustomAttribute(OptAttrTyp, true) is not OptionAttribute attr)
-					return null;
+				CommandLineValueAttribute c = pi.GetCustomAttribute(typeof(CommandLineValueAttribute), true)
+				as CommandLineValueAttribute;
+
+				OptionAttribute optattr = c as OptionAttribute;
+				bool isOpt = optattr != null;
+				if(!isOpt) {
+					if(c is not ArgumentAttribute argAttr)
+						return null;
+				}
 
 				Type propTyp = pi.PropertyType;
 
-				//Option opt = getOptT(propTyp);
+				Type propTypeFromNullable = !propTyp.IsValueType ? null : Nullable.GetUnderlyingType(propTyp);
 
-				Type constructedGenType = typeof(Option<>).MakeGenericType(propTyp);
-				Option opt = Activator.CreateInstance(constructedGenType, attr.Name, attr.Description) as Option;
+				bool isNullable = propTypeFromNullable != null;
+				if(isNullable)
+					propTyp = propTypeFromNullable;
 
-				if(attr.Required == true)
-					opt.IsRequired = true;
+				Type constructedGenType = (isOpt ? typeof(Option<>) : typeof(Argument<>)).MakeGenericType(propTyp);
+				Option opt = null;
+				Argument arg = null;
 
-				//opt.Name = attr.Name;
-				//opt.Description = attr.Description;
-				
-				if(attr.Alias.NotNulle())
-					opt.AddAlias(attr.Alias);
+				if(isOpt)
+					opt = Activator.CreateInstance(constructedGenType, c.Name, c.Description) as Option;
+				else
+					arg = Activator.CreateInstance(constructedGenType, c.Name, c.Description) as Argument;
+
+				if(isOpt) {
+					if(c.Required == true)
+						opt.IsRequired = true;
+
+					if(c.Alias.NotNulle())
+						opt.AddAlias(c.Alias);
+				}
 
 				object defVal = null;
-				if(propTyp.IsValueType)
+
+				if(propTyp.IsValueType) {
 					defVal = Activator.CreateInstance(propTyp);
+				}
 
-				if(attr.DefVal != null && defVal != null && !attr.DefVal.Equals(defVal))
-					opt.SetDefaultValue(attr.DefVal);
+				if(c.DefVal != null && defVal != null && !c.DefVal.Equals(defVal)) {
+					if(isOpt)
+						opt.SetDefaultValue(c.DefVal);
+					else
+						arg.SetDefaultValue(c.DefVal);
+				}
 
-				AutoPropGroup vv = new(propTyp, pi, attr, opt, defVal);
+				AutoPropGroup vv = new(propTyp, isNullable, pi, c, opt, arg, defVal);
 				return vv;
 			})
 			.Where(v => v != null)
 			.ToArray();
 
-		return ogroup;
+		info.Props = ogroup;
+
+		return info;
 	}
+
+	/// <summary>
+	/// Critical method. Used internally by AutoAttributesBinder to perform the
+	/// ultimate binding and reading of types / input into custom class.
+	/// 
+	/// </summary>
+	/// <param name="parseRes"></param>
+	/// <param name="p"></param>
+	/// <param name="item"></param>
+	public static void SetVal(ParseResult parseRes, AutoPropGroup p, object item)
+	{
+		//if(Verbose) { SetValVerbose(parseRes, p, item); return; }
+
+		object value = p.IsOption
+			? parseRes.GetValueForOption(p.option)
+			: parseRes.GetValueForArgument(p.argument);
+
+		Type propTyp = p.propertyType;
+
+		if(propTyp.IsValueType && p.isNullable)
+			value = Convert.ChangeType(value, propTyp);
+
+		bool hasDefVal = p.attr.DefVal != null;
+		if(hasDefVal && (value == null || value.Equals(p.defVal)))
+			value = p.attr.DefVal;
+
+		p.pi.SetValue(item, value);
+	}
+
+	//static bool Verbose = false;
+	//public static void SetValVerbose(ParseResult parseRes, AutoPropGroup p, object item)
+	//{
+	//	Option opt = p.option;
+	//	OptionAttribute attr = p.attr;
+
+	//	object value = parseRes.GetValueForOption(opt);
+
+	//	Type propTyp = p.propertyType;
+	//	string origTypNm = propTyp.FullName;
+
+	//	if(propTyp.IsValueType) {
+	//		if(p.isNullable) {
+	//			string valTypNm1 = value.GetType().FullName;
+	//			value = Convert.ChangeType(value, propTyp);
+	//			string valTypNm2 = value.GetType().FullName;
+	//		}
+	//	}
+
+	//	bool hasDefVal = attr.DefVal != null;
+
+	//	if(hasDefVal) {
+	//		if(value == null || value.Equals(p.defVal))
+	//			value = attr.DefVal;
+	//	}
+
+	//	p.pi.SetValue(item, value);
+	//}
 }
