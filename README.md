@@ -61,7 +61,7 @@ There are multiple full examples like this in the sample library. It is true tha
 
 Even better, we now have what I'm calling `Auto` types, by means of class and property attributes, in order to make this even simpler and cleaner, all while, very importantly, simply compiling down to the same types as above (i.e. `Option<T>`, `Argument<T>`, `Command<T>`, etc.
 
-```
+```csharp
 [Command(
 	"read",
 	"Read and display the file")]
@@ -82,7 +82,7 @@ public class ReadArgs
 
 To then use the above class to build it into a command line, it is literally as simple as this:
 
-```
+```csharp
 RootCommand rcmd = new("Who said command line isn't cool?!");
 
 rcmd.AddAutoCommand<ReadArgs>();
