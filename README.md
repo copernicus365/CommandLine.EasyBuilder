@@ -59,7 +59,7 @@ There are multiple full examples like this in the sample library. It is true tha
 
 ## Auto Examples
 
-Even better, we now have what I'm calling `Auto` types, by means of class and property attributes, in order to make this even simpler and cleaner, all while, very importantly, simply compiling down to the same types as above (i.e. `Option<T>`, `Argument<T>`, `Command<T>`, etc.
+Even better, we now have what I'm calling `Auto` types, by means of class and property attributes, in order to make this even simpler and cleaner, all while, very importantly, simply compiling down to the same `System.CommandLine` types (i.e. `Option<T>`, `Argument<T>`, `Command<T>`, etc.
 
 ```csharp
 [Command(
