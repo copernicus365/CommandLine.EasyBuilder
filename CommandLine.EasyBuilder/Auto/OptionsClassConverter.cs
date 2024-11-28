@@ -1,8 +1,6 @@
-using System;
 using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Reflection;
-using System.Runtime.ConstrainedExecution;
 
 using CommandLine.EasyBuilder.Private;
 
@@ -46,17 +44,6 @@ public class OptionsClassConverter
 
 		info.SetHandle(method, !isVoidRetType, _handle);
 		return _handle;
-
-		//object target = null;
-		//if(isVoidRetType) {
-		//	//Delegate.CreateDelegate(typeof(Action), new Handler(), eventHandler);
-		//	var h0 = method.CreateDelegate(typeof(Action), target: target);
-		//	//Action action = (Action)MethodInfo.CreateDelegate(typeof(Action), target, method);
-		//	var h1 = (Action)method.CreateDelegate(typeof(Action), target: target);
-		//}
-		//else {
-		//	var h2 = (Func<Task>)method.CreateDelegate(typeof(Func<Task>), target: target);
-		//}
 	}
 
 	public static AutoInfo GetAutoInfoOrThrow<T>() where T : class, new()

@@ -17,10 +17,9 @@ public static class AutoBuilderFX
 		if(!info.HandleIsAsync)
 			Handler.SetHandler(cmd, info.Handle as Action<TAuto>, binder);
 		else
-			Handler.SetHandler(cmd, info.Handle as Func<TAuto, Task>, binder); //async t => await info.HandleAsync()
+			Handler.SetHandler(cmd, info.Handle as Func<TAuto, Task>, binder);
 		return cmd;
 	}
-
 
 	public static Command AddAutoCommand<TAuto>(
 		this Command parentCmd,
