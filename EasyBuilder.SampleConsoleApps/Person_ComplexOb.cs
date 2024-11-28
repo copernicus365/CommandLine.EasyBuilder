@@ -1,13 +1,5 @@
 using System.CommandLine;
 using System.CommandLine.Binding;
-//using System.CommandLine.Builder;
-//using System.CommandLine.Completions;
-//using System.CommandLine.Help;
-//using System.CommandLine.Invocation;
-//using System.CommandLine.IO;
-//using System.CommandLine.Parsing;
-//using System.CommandLine.NamingConventionBinder;
-//using System.Reflection;
 
 namespace EasyBuilder.Samples.V1;
 
@@ -35,8 +27,7 @@ public class Program
 		rootCommand.Add(firstNameOption);
 		rootCommand.Add(lastNameOption);
 
-		rootCommand.SetHandler((fileOptionValue, person) =>
-		{
+		rootCommand.SetHandler((fileOptionValue, person) => {
 			DoRootCommand(fileOptionValue, person);
 		},
 			fileOption, new PersonBinder(firstNameOption, lastNameOption));
@@ -81,50 +72,6 @@ public class Program
 	public class ArrTypeBinder : BinderBase<Dictionary<string, object>>
 	{
 		protected override Dictionary<string, object> GetBoundValue(BindingContext bindingContext)
-		{
-			throw new NotImplementedException();
-		}
+			=> throw new NotImplementedException();
 	}
 }
-//public class T1
-//{
-//	public void dd()
-//	{
-//		//System.CommandLine.NamingConventionBinder.ConstructorDescriptor
-//		//ICommandOptionsHandler
-//	}
-
-//}
-
-//public class HelloCommand : Command<HelloCommandOptions, HelloCommandOptionsHandler>
-//{
-//	// Keep the hard dependency on System.CommandLine here
-//	public HelloCommand()
-//		: base("hello", "Say hello to someone")
-//	{
-//		this.AddOption(new Option<string>("--to", "The person to say hello to"));
-//	}
-//}
-
-//public class HelloCommandOptions : ICommandOptions
-//{
-//	// Automatic binding with System.CommandLine.NamingConventionBinder
-//	public string To { get; set; } = string.Empty;
-//}
-
-//public class HelloCommandOptionsHandler : ICommandOptionsHandler<HelloCommandOptions>
-//{
-//	private readonly IConsole _console;
-
-//	// Inject anything here, no more hard dependency on System.CommandLine
-//	public HelloCommandOptionsHandler(IConsole console)
-//	{
-//		this._console = console;
-//	}
-
-//	public Task<int> HandleAsync(HelloCommandOptions options, CancellationToken cancellationToken)
-//	{
-//		this._console.WriteLine($"Hello {options.To}!");
-//		return Task.FromResult(0);
-//	}
-//}
