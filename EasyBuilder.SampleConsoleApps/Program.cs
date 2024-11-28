@@ -11,7 +11,7 @@ class Program
 	public static async Task<int> Main(string[] args)
 	{
 		bool getNew = true;
-		int progNum = 4;
+		int progNum = 5;
 
 		string appDescription = ExampleAppDescription(progNum, getNew);
 

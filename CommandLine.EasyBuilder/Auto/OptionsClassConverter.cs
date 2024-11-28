@@ -105,20 +105,33 @@ public class OptionsClassConverter
 						opt.AddAlias(c.Alias);
 				}
 
-				object defVal = null;
+				// NEED to have default(T)
+				// SET THESE FOR NULL, but then FIX for value types next
+				object defaultT = null;
+				bool hasDefPropSet = c.DefVal != null;
 
-				if(propTyp.IsValueType) {
-					defVal = Activator.CreateInstance(propTyp);
-				}
+				if(hasDefPropSet && // if is NULL, then no use...
+					propTyp.IsValueType) {
 
-				if(c.DefVal != null && defVal != null && !c.DefVal.Equals(defVal)) {
+					// hasDefPropSet incorrectly said TRUE bec only tested NULL, fix for val type
+					// must create an instance to compare
+
+					defaultT = Activator.CreateInstance(propTyp);
+
+					if(defaultT != null
+						&& c.DefVal.Equals(defaultT)) {
+						hasDefPropSet = false; // have OFFICIALLY stopped val types from saying they had a value set
+					}
+				} // no else needed, initial values handled not value type
+
+				if(hasDefPropSet) {
 					if(isOpt)
 						opt.SetDefaultValue(c.DefVal);
 					else
 						arg.SetDefaultValue(c.DefVal);
 				}
 
-				AutoPropGroup vv = new(propTyp, isNullable, pi, c, opt, arg, defVal);
+				AutoPropGroup vv = new(propTyp, isNullable, pi, c, opt, arg, defaultT);
 				return vv;
 			})
 			.Where(v => v != null)
