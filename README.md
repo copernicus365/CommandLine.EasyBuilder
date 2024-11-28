@@ -2,7 +2,7 @@
 
 Extending upon the terrific `System.CommandLine` library, `CommandLine.EasyBuilder` offers a more functional and user friendly way of building up `System.CommandLine`'s types. While `System.CommandLine` is a very solid library that is a joy to use once it is running, the one glaring problem is when one is on the end of specifying or building it up. On that front there is much to be desired.
 
-The bad thing about that is, I envision command-line apps could start taking pride of place in the dotnet world, where many console apps could simply and easily be converted to being command-line apps (note: command-line apps do *not* have to be a single run thing, nor do they have to take their arguments from Main's args. And nor do they have to auto close after running once. In fact they can just as easily be run in a loop with new input per round just as easily, actually, simply identically, as we do with console apps.
+The bad thing about that is, I envision command-line apps could start taking pride of place in the dotnet world, where many console apps could simply and easily be converted to being command-line apps (note: command-line apps do *not* have to be a single run thing, nor do they have to take their arguments from Main's args. And nor do they have to auto close after running once. In fact they can just as easily be run in a loop with new input per round just as easily, actually, simply identically, as we do with console apps.)
 
 But currently, in my view people aren't going to do this nearly as often as they would because of the mundane and tedious manner in which `System.CommandLine` requires in order to specifiy and build up the command line parameters.
 
@@ -60,7 +60,7 @@ There are multiple full examples like this in the sample library. Yes, this new 
 
 ## Auto Examples
 
-Even better, we now have what I'm calling `Auto` types, by means of class and property attributes, in order to make this even simpler and cleaner, all while, very importantly, simply compiling down to he same types as above (i.e. `Option<T>`, `Argument<T>`, `Comman<T>`, etc.
+Even better, we now have what I'm calling `Auto` types, by means of class and property attributes, in order to make this even simpler and cleaner, all while, very importantly, simply compiling down to the same types as above (i.e. `Option<T>`, `Argument<T>`, `Command<T>`, etc.
 
 ```
 [Command(
@@ -89,6 +89,6 @@ RootCommand rcmd = new("Who said command line isn't cool?!");
 rcmd.AddAutoCommand<ReadArgs>();
 ```
 
-I would like to strongly emphasize this again: Beyond building the app with these new functional and POCO type classes, *everything* then builds down to the same types: `Option<T>`, `Argument<T>`, `Comman<T>` etc. One can then do the same with those types as they ever would have done with `System.CommandLine`.
+I would like to strongly emphasize this again: Beyond building the app with these new functional and POCO type classes, *everything* then builds down to the same types: `Option<T>`, `Argument<T>`, `Command<T>` etc. One can then do the same with those types as they ever would have done with `System.CommandLine`.
 
 As an aside: *personally* I would argue that the classes one uses for specifying the app, like `ReadArgs` above, are better to be seen as a DTO / data transfer object types like we see in the web and ASP.NET world. In other words, probably better to let the `ReadArgs` class be limited to the singular problem of taking initial input from the command line for any more serious use case.
