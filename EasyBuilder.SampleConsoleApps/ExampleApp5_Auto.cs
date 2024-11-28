@@ -9,9 +9,9 @@ public class ExampleApp5_Auto
 {
 	public RootCommand GetApp()
 	{
-		RootCommand rootCmd = new("Testing default and nullable type issues...");
+		RootCommand rootCmd = new("Cool app!");
 
-		Command teachCmd = new("teach", "Fun foo bar command");
+		Command teachCmd = new("teach", "Ben Stein says teach this well");
 		rootCmd.AddCommand(teachCmd);
 
 		teachCmd.AddAutoCommand<FunArgs>();
@@ -21,12 +21,10 @@ public class ExampleApp5_Auto
 	}
 }
 
-public enum FunnyType { None = 0, Dry = 1, Crackup = 2 }
-
 [Command("fun", "Silly test type for dealing with default and nullable value types")]
 public class FunArgs
 {
-	[Argument("arg1", description: "Testing?!")]
+	[Argument("arg", description: "I'm an argument")]
 	public string Arg1 { get; set; }
 
 	[Option("--name", "-n", DefVal = "Charlie Brown")]
@@ -41,3 +39,5 @@ public class FunArgs
 	public void Handle()
 		=> $"Hello {Name}, you are {Fun} funny type, with {Delay} delay. And oh, arg = `{Arg1?.ToUpper()}`".Print();
 }
+
+public enum FunnyType { None = 0, Dry = 1, Crackup = 2 }

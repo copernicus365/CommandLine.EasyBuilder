@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net8.0</TargetFramework>
-    <VersionPrefix>1.0.3</VersionPrefix>
+    <VersionPrefix>1.0.2</VersionPrefix>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <RootNamespace>CommandLine.EasyBuilder</RootNamespace>
@@ -15,7 +15,7 @@
     <PackageTags>System.CommandLine, simple, functional, builder</PackageTags>
     <PackageReleaseNotes />
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Description>Minimal extensions to the System.CommandLine library that allow a more functional way of building a command line app: visually easier to comprehend, and more DRY</Description>
+    <Description>Extending upon the terrific `System.CommandLine` library, `CommandLine.EasyBuilder` offers a more functional and user friendly way of building up `System.CommandLine`'s types.</Description>
     <NoWarn>1701;1702;1591;</NoWarn>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>

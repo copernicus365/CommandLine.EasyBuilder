@@ -10,11 +10,11 @@ public class ExampleApp4_Auto(string appDescription)
 	public RootCommand GetApp()
 	{
 		RootCommand rootCmd = new(appDescription);
+		rootCmd.AddAutoCommand<ReadArgs>();
 
 		Option<FileInfo> nameOpt = new Option<FileInfo>("--file", description: "Display some file..")
 			.Alias("-f");
 
-		rootCmd.AddAutoCommand<ReadArgs>();
 
 		//rootCmd.AddAutoCommand((ReadArgs w) => w.Handle());
 		return rootCmd;
