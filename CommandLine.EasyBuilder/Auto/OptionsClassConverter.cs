@@ -36,7 +36,8 @@ public class OptionsClassConverter
 		}
 		else {
 			Func<TAuto, Task> handle = async (TAuto v) => {
-				Task<TAuto> result = (Task<TAuto>)info.Method.Invoke(v, null);
+				object res = info.Method.Invoke(v, null);
+				Task result = res as Task;
 				await result;
 			};
 			_handle = handle;
