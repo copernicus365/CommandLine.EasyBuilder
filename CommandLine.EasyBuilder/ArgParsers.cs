@@ -16,6 +16,9 @@ public static class ArgParsers
 	public static double[] DoubleArray(ArgumentResult arg)
 		=> ArrayParser(arg, str => double.TryParse(str, out double val) ? (double?)val : null);
 
+	public static double[] DoubleArray(string val, out string error)
+		=> ArrayParser(val, str => double.TryParse(str, out double val) ? (double?)val : null, out error);
+
 	public static long[] LongArray(ArgumentResult arg)
 		=> ArrayParser(arg, str => long.TryParse(str, out long val) ? (long?)val : null);
 
@@ -24,7 +27,17 @@ public static class ArgParsers
 
 	public static T[] ArrayParser<T>(ArgumentResult arg, Func<string, T?> conv) where T : struct
 	{
-		string str = arg.Tokens.Single().Value;//?.Trim();
+		string str = arg.Tokens.Single().Value; //?.Trim();
+		T[] res = ArrayParser<T>(arg.Tokens.Single().Value, conv, out string err);
+		if(err != null)
+			arg.ErrorMessage = err;
+		return res;
+	}
+
+	public static T[] ArrayParser<T>(string str, Func<string, T?> conv, out string error) where T : struct
+	{
+		error = null;
+
 		if(str == null)
 			return null;
 
@@ -42,7 +55,7 @@ public static class ArgParsers
 			string s = svals[i];
 			T? val = conv(s);
 			if(val == null) {
-				arg.ErrorMessage = $"Value is out of range or invalid: {s}";
+				error = $"Value is out of range or invalid: {s}";
 				return null;
 			}
 			arr[i] = val.Value;

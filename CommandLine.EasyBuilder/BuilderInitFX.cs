@@ -368,7 +368,7 @@ public static class BuilderInitFX
 		return cmd;
 	}
 
-	static Command AddVal<T>(this Command cmd, IValueDescriptor<T> val)
+	public static Command AddVal<T>(this Command cmd, IValueDescriptor<T> val)
 	{
 		switch(val) {
 			case Option<T> opt:
