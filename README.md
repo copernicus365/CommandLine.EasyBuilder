@@ -40,9 +40,8 @@ readCmd.SetHandler(async (file, fgcolor, delay, lightMode) => {
 
 NEW:
 
-```
+```csharp
 Command readCmd = new Command("read", "Read and display the file.").Init(
-	//...
 	new Option<double>(
 		name: "--delay",
 		description: "Delay between lines, specified as milliseconds per character in a line.",
@@ -56,7 +55,7 @@ Command readCmd = new Command("read", "Read and display the file.").Init(
 
 No duplications, all DRY! All far more functional, while in this way loosing virtually nothing. You can just as well for example build that option as a separate variable still.
 
-There are multiple full examples like this in the sample library. Yes, this new way takes far fewer lines of code, but I don't think that is what is so key, simple white space, no; It is massively cognitively simplifying what is going on, with an enormous decreaese in repetition, and disjointedness.
+There are multiple full examples like this in the sample library. It is true that this way takes far fewer lines of code (almost half), but more key is the cognitive simplification and decrease in repetition.
 
 ## Auto Examples
 
