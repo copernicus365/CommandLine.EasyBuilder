@@ -73,8 +73,6 @@ public class ReadArgs
 		DefVal = 42.0)]
 	public double? Delay { get; set; }
 
-	// ...
-
 	public async Task Handle()
 		=> await ReadFile(file!, fgcolor, delay, lightMode);
 }
