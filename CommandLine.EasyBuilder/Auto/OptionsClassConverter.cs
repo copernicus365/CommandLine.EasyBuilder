@@ -8,8 +8,6 @@ namespace CommandLine.EasyBuilder.Auto;
 
 public class OptionsClassConverter
 {
-	static readonly Type OptAttrTyp = typeof(OptionAttribute);
-
 	public static CommandAttribute GetControlAttr<T>()
 		=> typeof(T).GetCustomAttributes(typeof(CommandAttribute), true).FirstOrDefault() as CommandAttribute;
 
@@ -50,7 +48,7 @@ public class OptionsClassConverter
 	public static AutoInfo GetAutoInfoOrThrow<T>() where T : class, new()
 	{
 		AutoInfo info = GetAutoInfo<T>();
-		if(info == null || info.NoProperties)
+		if(info == null) // || info.NoProperties)
 			throw new ArgumentException("Type if invalid, no attributes / properties found");
 		return info;
 	}
@@ -59,8 +57,8 @@ public class OptionsClassConverter
 	{
 		Type type = typeof(T);
 
-		PropertyInfo[] props = type.GetProperties();
-		if(props.IsNulle())
+		PropertyInfo[] props = type.GetProperties() ?? [];
+		if(props == null)
 			return null;
 
 		AutoInfo info = new() {
