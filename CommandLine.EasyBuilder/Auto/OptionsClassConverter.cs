@@ -162,38 +162,40 @@ public class OptionsClassConverter
 			value = Convert.ChangeType(value, propTyp);
 
 		bool hasDefVal = p.attr.DefVal != null;
-		if(hasDefVal && (value == null || value.Equals(p.defVal)))
-			value = p.attr.DefVal;
+		if(hasDefVal && (value == null || value.Equals(p.defaultOfTVal))) {
+
+			var aliases = p.option.Aliases;
+
+			if(!p.IsNonNullableValueTypeAndValEqualsDefaultTButNotDefValue(value) || (aliases?.Count ?? 0) < 1) {
+				value = p.attr.DefVal;
+			}
+			else {
+				// IN THIS CASE, *especially* for BOOLs(!), we HAVE to know if the option EXISTED in the input
+				// otherwise there's NO WAY to know if DefVal should be used
+				//Token tkn = parseRes.Tokens.FirstOrDefault(t =>
+				int tknMatchCount = parseRes.Tokens.Count(t =>
+					t.Type == TokenType.Option &&
+					aliases.Any(a => string.Equals(a, t.Value, StringComparison.OrdinalIgnoreCase)));
+				if(tknMatchCount < 1) // if(tkn == null) see bug below can't test!
+					value = p.attr.DefVal;  // token was NOT in input, so DO use DefVal
+
+				/*
+				 * WHOA, bug in System.CommandLine! CanNOT test the most simplest of test, for obj == null! -> `tkn == null`
+				 * Looks like they have an op_Equality BUG that THROWS test for null
+tkn == null
+'tkn == null' threw an exception of type 'System.NullReferenceException'
+    Data: {System.Collections.ListDictionaryInternal}
+    HResult: -2147467261
+    HelpLink: null
+    InnerException: null
+    Message: "Object reference not set to an instance of an object."
+    Source: "System.CommandLine"
+    StackTrace: "   at System.CommandLine.Parsing.Token.op_Equality(Token left, Token right)"
+    TargetSite: {Boolean op_Equality(System.CommandLine.Parsing.Token, System.CommandLine.Parsing.Token)}
+				 */
+			}
+		}
 
 		p.pi.SetValue(item, value);
 	}
-
-	//static bool Verbose = false;
-	//public static void SetValVerbose(ParseResult parseRes, AutoPropGroup p, object item)
-	//{
-	//	Option opt = p.option;
-	//	OptionAttribute attr = p.attr;
-
-	//	object value = parseRes.GetValueForOption(opt);
-
-	//	Type propTyp = p.propertyType;
-	//	string origTypNm = propTyp.FullName;
-
-	//	if(propTyp.IsValueType) {
-	//		if(p.isNullable) {
-	//			string valTypNm1 = value.GetType().FullName;
-	//			value = Convert.ChangeType(value, propTyp);
-	//			string valTypNm2 = value.GetType().FullName;
-	//		}
-	//	}
-
-	//	bool hasDefVal = attr.DefVal != null;
-
-	//	if(hasDefVal) {
-	//		if(value == null || value.Equals(p.defVal))
-	//			value = attr.DefVal;
-	//	}
-
-	//	p.pi.SetValue(item, value);
-	//}
 }

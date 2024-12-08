@@ -5,9 +5,21 @@ using CommandLine.EasyBuilder.Private;
 
 namespace CommandLine.EasyBuilder.Auto;
 
-public record AutoPropGroup(Type propertyType, bool isNullable, PropertyInfo pi, CommandLineValueAttribute attr, Option option, Argument argument, object defVal)
+public record AutoPropGroup(Type propertyType, bool isNullable, PropertyInfo pi, CommandLineValueAttribute attr, Option option, Argument argument, object defaultOfTVal)
 {
 	public bool IsOption => option != null;
+
+	public bool IsNonNullableValueTypeAndValEqualsDefaultTButNotDefValue(object value)
+	{
+		bool val =
+			propertyType.IsValueType &&
+			!isNullable &&
+			attr.DefVal != null &&
+			value != null &&
+			!value.Equals(attr.DefVal) &&
+			value.Equals(defaultOfTVal);
+		return val;
+	}
 }
 
 public class AutoInfo
