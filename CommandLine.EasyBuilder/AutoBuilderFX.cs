@@ -112,8 +112,10 @@ public static class AutoBuilderFX
 
 		if(setHandle) {
 			object handle = OptionsClassConverter.GetHandleMethod<T>(autoInfo);
-			if(!autoInfo.HasHandle)
-				throw new ArgumentException("Type has no handle");
+			if(!autoInfo.HasHandle) {
+				// actually can be handy to have simple commands with no handle
+				//throw new ArgumentException("Type has no handle");
+			}
 		}
 		return cmd;
 	}
