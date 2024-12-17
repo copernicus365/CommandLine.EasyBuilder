@@ -8,6 +8,30 @@ namespace CommandLine.EasyBuilder;
 
 public static class AutoBuilderFX
 {
+	/// <summary>
+	/// Adds `TAuto` as a child <see cref="Command"/>,
+	/// but then *returns the parent* command. USE this when you do NOT need
+	/// an instance of the newly created <see cref="Command"/>. What this makes for
+	/// is a very handy and functional chained build process of adding often multiple
+	/// commands to a parent all in one call chain.
+	/// </summary>
+	/// <typeparam name="TAuto"></typeparam>
+	/// <param name="parentCmd"></param>
+	/// <returns>Returns the PARENT, not the new command</returns>
+	public static Command Auto<TAuto>(this Command parentCmd) where TAuto : class, new()
+	{
+		var cmd = parentCmd.AddAutoCommand<TAuto>();
+		return parentCmd;
+	}
+
+
+	/// <summary>
+	/// Makes an instance of `TAuto` as a child <see cref="Command"/> added to
+	/// the parent. Then returns the newly created child instance.
+	/// </summary>
+	/// <typeparam name="TAuto"></typeparam>
+	/// <param name="parentCmd"></param>
+	/// <returns>Returns new instance of `TAuto` just added to parent</returns>
 	public static Command AddAutoCommand<TAuto>(this Command parentCmd) where TAuto : class, new()
 	{
 		Command cmd = AddAuto(parentCmd, out AutoAttributesBinder<TAuto> binder, setHandle: true);
@@ -135,7 +159,3 @@ public static class AutoBuilderFX
 		return cmd;
 	}
 }
-
-//public class AutoBuilder(RootCommand rootCmd)
-//{
-//}
