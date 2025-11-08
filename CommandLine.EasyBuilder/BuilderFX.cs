@@ -8,13 +8,13 @@ public static class BuilderFX
 
 	public static Option<T> Alias<T>(this Option<T> opt, string alias)
 	{
-		opt.AddAlias(alias);
+		opt.Aliases.Add(alias);
 		return opt;
 	}
 
 	public static Command Alias(this Command cmd, string alias)
 	{
-		cmd.AddAlias(alias);
+		cmd.Aliases.Add(alias);
 		return cmd;
 	}
 
@@ -23,7 +23,8 @@ public static class BuilderFX
 
 	public static Option<T> DefaultValue<T>(this Option<T> opt, object? value)
 	{
-		opt.SetDefaultValue(value);
+		opt.DefaultValueFactory = _ => (T)value!;
+		//opt.SetDefaultValue(value);
 		return opt;
 	}
 }

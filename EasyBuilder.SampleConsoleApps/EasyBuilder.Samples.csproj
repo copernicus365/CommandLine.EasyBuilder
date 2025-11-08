@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -20,14 +20,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetXtensions" Version="4.3.0" />
+    <ProjectReference Include="..\CommandLine.EasyBuilder\CommandLine.EasyBuilder.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetXtensions" Version="4.4.0" />
     <PackageReference Include="DotNetXtensions.Json" Version="3.5.0" />
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <!--<PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta2.21617.1" />-->
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CommandLine.EasyBuilder\CommandLine.EasyBuilder.csproj" />
+    <ProjectReference Include="..\..\CommandLine\command-line-api-vcool\System.CommandLine\System.CommandLine.csproj" />
+    <!--<PackageReference Include="System.CommandLine" Version="2.0.0-rc.2.25502.107" />-->
   </ItemGroup>
 
   <ItemGroup>

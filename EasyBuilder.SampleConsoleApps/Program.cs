@@ -15,25 +15,35 @@ class Program
 
 		string appDescription = ExampleAppDescription(progNum, getNew);
 
-		RootCommand rootCommand = progNum switch {
-			1 => new ExampleApp1(appDescription).GetApp(getNew),
-			2 => new ExampleApp2(appDescription).GetApp(getNew),
-			3 => new ExampleApp3(appDescription).GetApp(getNew),
+		RootCommand root = progNum switch {
+			//1 => new ExampleApp1(appDescription).GetApp(getNew),
+			//2 => new ExampleApp2(appDescription).GetApp(getNew),
+			//3 => new ExampleApp3(appDescription).GetApp(getNew),
 			4 => new ExampleApp4_Auto(appDescription).GetApp(),
 			5 => new ExampleApp5_Auto().GetApp(),
 			_ => throw new ArgumentOutOfRangeException(),
 		};
 
-		rootCommand.Invoke("-h");
+		if(args.NotNulle()) {
+			ParseResult res = root.Parse(args);
+			int dRes = await res.InvokeAsync();
+			return dRes;
+		}
+
+		bool showHelp = true;
+		if(showHelp) {
+			//root.Invoke("-h");
+		}
 
 		while(true) {
 			Write("Input: ");
-			string arg = ReadLine();
+			string cmdLine = ReadLine();
 
-			int res = arg == null
-				? await rootCommand.InvokeAsync(args)
-				: await rootCommand.InvokeAsync(arg);
+			ParseResult res = root.Parse(cmdLine);
+			int dRes = await res.InvokeAsync();
 		}
+
+		return 0;
 	}
 
 	public static string ExampleAppDescription(int num, bool isNew)

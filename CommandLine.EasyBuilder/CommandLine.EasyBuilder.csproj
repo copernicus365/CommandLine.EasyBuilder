@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <VersionPrefix>1.0.6</VersionPrefix>
+    <TargetFramework>net9.0</TargetFramework>
+    <VersionPrefix>1.1</VersionPrefix>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <RootNamespace>CommandLine.EasyBuilder</RootNamespace>
@@ -25,7 +25,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+    <PackageReference Include="DotNetXtensions" Version="4.4.0" />
+    <!--<PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />-->
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\CommandLine\command-line-api-vcool\System.CommandLine\System.CommandLine.csproj" />
+    <!--<PackageReference Include="System.CommandLine" Version="2.0.0-rc.2.25502.107" />-->
   </ItemGroup>
 
 </Project>

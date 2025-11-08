@@ -30,7 +30,7 @@ public static class ArgParsers
 		string str = arg.Tokens.Single().Value; //?.Trim();
 		T[] res = ArrayParser<T>(arg.Tokens.Single().Value, conv, out string err);
 		if(err != null)
-			arg.ErrorMessage = err;
+			arg.AddError(err); //.ErrorMessage = err;
 		return res;
 	}
 

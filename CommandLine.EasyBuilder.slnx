@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="../CommandLine/command-line-api-vcool/System.CommandLine/System.CommandLine.csproj" />
   <Project Path="CommandLine.EasyBuilder\CommandLine.EasyBuilder.csproj" />
   <Project Path="EasyBuilder.SampleConsoleApps\EasyBuilder.Samples.csproj" />
 </Solution>
