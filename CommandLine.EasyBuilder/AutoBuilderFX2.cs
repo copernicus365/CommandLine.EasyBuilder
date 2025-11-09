@@ -26,7 +26,6 @@ public static class AutoBuilderFX
 		CmdProp[] arr = model.Props;
 		CommandAttribute cmdAttr = model.CommandAttr;
 
-
 		Command cmd = new(name: cmdAttr.Name, description: cmdAttr.Description);
 		model.Cmd = cmd;
 
@@ -34,7 +33,7 @@ public static class AutoBuilderFX
 			cmd.Alias(cmdAttr.Alias);
 
 		foreach(CmdProp p in arr)
-			p.AddToCmd(cmd); //AddVal(cmd, p.IsOption ? p.option : p.argument);
+			p.AddToCmd(cmd);
 
 		parentCmd?.Subcommands.Add(cmd);
 

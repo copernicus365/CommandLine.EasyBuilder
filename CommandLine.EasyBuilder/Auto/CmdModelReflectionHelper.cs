@@ -79,29 +79,22 @@ public class CmdModelReflectionHelper
 		}
 
 		CmdProp[] ogroup = [.. props.Select(GetCmdProperties).Where(v => v != null)];
-		
+
+		MethodInfo parseResultSetter = props.FirstOrDefault(p =>
+			p.PropertyType == typeof(ParseResult) &&
+			p.CanWrite &&
+			(p.Name == "ParseResult" || p.Name == "ParsedResult") &&
+			p.SetMethod != null &&
+			p.SetMethod.IsPublic)?.SetMethod;
+
 		CmdModelInfo<T> info = new() {
 			Type = type,
 			CommandAttr = GetCommandAttribute<T>(),
 			Props = ogroup,
+			ParseResultSetter = parseResultSetter
 		};
 
 		return info;
-	}
-
-	class Foo { public string Name { get; set; } }
-
-	class Foo<T> : Foo { public Func<T> GetVal { get; set; } }
-
-
-	static void SetStuff(Type genericPropTyp, string name)
-	{
-
-		Type constructedGenType = typeof(Foo<>).MakeGenericType(genericPropTyp);
-
-		Foo opt = Activator.CreateInstance(constructedGenType) as Foo;
-
-		opt.Name = name;
 	}
 
 	static CmdProp GetCmdProperties(PropertyInfo pi)
@@ -120,8 +113,8 @@ public class CmdModelReflectionHelper
 		Type propTypeFromNullable = !propTyp.IsValueType ? null : Nullable.GetUnderlyingType(propTyp);
 
 		bool isNullable = propTypeFromNullable != null;
-		if(isNullable)
-			propTyp = propTypeFromNullable;
+		//if(isNullable)
+		//	propTyp = propTypeFromNullable; // <<< ERROR! messed up things, is fine ... I think ... w/out
 
 		Type constructedGenType = (isOpt ? typeof(Option<>) : typeof(Argument<>)).MakeGenericType(propTyp);
 		Option opt = null;
@@ -188,7 +181,6 @@ public class CmdModelReflectionHelper
 
 		CmdProp vv = new(propTyp, isNullable, pi, c, opt, arg, defaultT);
 		return vv;
-
 	}
 
 	static Delegate GetArgResFuncReturnsObjectVal(Type genericPropTyp, object val)
@@ -213,57 +205,90 @@ public class CmdModelReflectionHelper
 	/// <param name="item"></param>
 	public static void SetVal(ParseResult parseRes, CmdProp p, object item)
 	{
-		//if(Verbose) { SetValVerbose(parseRes, p, item); return; }
-		parseRes.va .GetValue(p.attr.Name)
-
-#warning ... FIX!
-		throw new NotImplementedException();
-
-		object value = default;
-		//p.IsOption
-		//? parseRes.va .GetValueForOption(p.option)
-		//: parseRes.GetValueForArgument(p.argument);
-
+		string name = p.attr.Name;
 		Type propTyp = p.type;
 
-		if(propTyp.IsValueType && p.isNullable)
-			value = Convert.ChangeType(value, propTyp);
+		// >> get value via attr-name
+		// >> get value via Option<T> / Argument<T> ... I quit because getting typeof arg added pain
+		MethodInfo method = (typeof(ParseResult)).GetMethod("GetValue", [typeof(string)]).MakeGenericMethod(propTyp);
+		object prm = name;
+		object value = method.Invoke(parseRes, [prm]);
+
+		if(value != null && propTyp.IsValueType && p.isNullable) {
+			//value = Convert.ChangeType(value, propTyp); // ??
+			// NOTE #0
+		}
 
 		bool hasDefVal = p.attr.DefVal != null;
-		if(hasDefVal && (value == null || value.Equals(p.defaultOfTVal))) {
+		if(!hasDefVal) {
 
+		}
+		else if(value == null || value.Equals(p.defaultOfTVal)) {
+			// --- IF NULL or DEFAULT ---
 			var aliases = p.option.Aliases;
 
-			if(!p.IsNonNullableValueTypeAndValEqualsDefaultTButNotDefValue(value) || (aliases?.Count ?? 0) < 1) {
+			if(!p.IsNonNullableValueTypeAndValEqualsDefaultTButNotDefValue(value)) { // || (aliases?.Count ?? 0) < 1) {
 				value = p.attr.DefVal;
 			}
 			else {
-				// IN THIS CASE, *especially* for BOOLs(!), we HAVE to know if the option EXISTED in the input
-				// otherwise there's NO WAY to know if DefVal should be used
-				//Token tkn = parseRes.Tokens.FirstOrDefault(t =>
+				// NOTE #1
 				int tknMatchCount = parseRes.Tokens.Count(t =>
 					t.Type == TokenType.Option &&
 					aliases.Any(a => string.Equals(a, t.Value, StringComparison.OrdinalIgnoreCase)));
 				if(tknMatchCount < 1) // if(tkn == null) see bug below can't test!
 					value = p.attr.DefVal;  // token was NOT in input, so DO use DefVal
 
-				/*
-				 * WHOA, bug in System.CommandLine! CanNOT test the most simplest of test, for obj == null! -> `tkn == null`
-				 * Looks like they have an op_Equality BUG that THROWS test for null
-tkn == null
-'tkn == null' threw an exception of type 'System.NullReferenceException'
-    Data: {System.Collections.ListDictionaryInternal}
-    HResult: -2147467261
-    HelpLink: null
-    InnerException: null
-    Message: "Object reference not set to an instance of an object."
-    Source: "System.CommandLine"
-    StackTrace: "   at System.CommandLine.Parsing.Token.op_Equality(Token left, Token right)"
-    TargetSite: {Boolean op_Equality(System.CommandLine.Parsing.Token, System.CommandLine.Parsing.Token)}
-				 */
+				// NOTE #2
 			}
 		}
 
 		p.pi.SetValue(item, value);
 	}
 }
+
+#region --- SetVal notes ---
+
+// NOTE #0:
+// FIXED! It was our own prob... i think... WE were REGISTERING nullable properties as not nullable 
+//// FIX PROBLEM: for nullable value type (eg `int?` property) lib is
+//// returning a set default value eg `0` instead of NULL!!
+//if(value != null && value.Equals(p.defaultOfTVal)) {
+//	var tt1 = parseRes.Tokens.FirstOrDefault(t => t.Type == TokenType.Option && t.Value != null);
+//	value = null;
+//}
+
+// NOTE #1
+// IN THIS CASE, *especially* for BOOLs(!), we HAVE to know if the option EXISTED in the input
+// otherwise there's NO WAY to know if DefVal should be used
+// Token tkn = parseRes.Tokens.FirstOrDefault(t =>
+
+// NOTE #2
+// WHOA, bug in System.CommandLine! CanNOT test the most simplest of test, for obj == null! -> `tkn == null`
+// Looks like they have an op_Equality BUG that THROWS test for null
+//tkn == null
+//'tkn == null' threw an exception of type 'System.NullReferenceException'
+//    Data: {System.Collections.ListDictionaryInternal}
+//    HResult: -2147467261
+//    HelpLink: null
+//    InnerException: null
+//    Message: "Object reference not set to an instance of an object."
+//    Source: "System.CommandLine"
+//    StackTrace: "   at System.CommandLine.Parsing.Token.op_Equality(Token left, Token right)"
+//    TargetSite: {Boolean op_Equality(System.CommandLine.Parsing.Token, System.CommandLine.Parsing.Token)}
+
+#endregion
+
+#region --- Foo test ---
+
+//class Foo { public string Name { get; set; } }
+
+//class Foo<T> : Foo { public Func<T> GetVal { get; set; } }
+
+//static void SetStuff(Type genericPropTyp, string name)
+//{
+//	Type constructedGenType = typeof(Foo<>).MakeGenericType(genericPropTyp);
+//	Foo opt = Activator.CreateInstance(constructedGenType) as Foo;
+//	opt.Name = name;
+//}
+
+#endregion

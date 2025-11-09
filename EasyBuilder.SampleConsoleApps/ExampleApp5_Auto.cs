@@ -23,11 +23,20 @@ public class ExampleApp5_Auto
 [Command("fun", "Silly test type for dealing with default and nullable value types")]
 public class FunArgs
 {
-	[Option("--name", "-n", DefVal = "Charlie Brown")]
+	[Option("--name", "-n", DefVal = "Charlie")]
 	public string Name { get; set; }
 
-	[Option(name: "--last-name", alias: "-ln", description: "Bogus last name", DefVal = "Fergy", Required = true)]
+	[Option(name: "--last-name", alias: "-ln", description: "Bogus last name", Required = true)]
 	public string LastName { get; set; }
+
+	[Option(name: "--pw", alias: "-p", Required = true)]
+	public string Pword { get; set; }
+
+	[Option(name: "--age", DefVal = 47)]
+	public int Age { get; set; }
+
+	[Option(name: "--fav-num")]
+	public int? FavoriteNumber { get; set; }
 
 	//[Argument("arg", description: "I'm an argument")]
 	//public string Arg1 { get; set; }
@@ -38,7 +47,9 @@ public class FunArgs
 	[Option("--delay", "-d", DefVal = 42, Description = "Delay between lines, specified as milliseconds per character in a line")]
 	public int? Delay { get; set; }
 
-	public void Handle(ParseResult result)
+	public System.CommandLine.ParseResult ParseResult { get; set; }
+
+	public void Handle()
 		=> "hi!".Print();
 
 	public async Task Handle2(ParseResult result)

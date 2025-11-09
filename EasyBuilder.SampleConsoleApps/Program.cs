@@ -37,10 +37,15 @@ class Program
 
 		while(true) {
 			Write("Input: ");
+
 			string cmdLine = ReadLine();
+			WriteLine();
 
 			ParseResult res = root.Parse(cmdLine);
 			int dRes = await res.InvokeAsync();
+
+			WriteLine();
+			WriteLine();
 		}
 
 		return 0;

@@ -53,6 +53,10 @@ public abstract class CmdModelInfo
 
 	public MethodInfo Method { get; private set; }
 
+	public bool HasParseResultProp => ParseResultSetter != null;
+
+	public MethodInfo ParseResultSetter { get; set; }
+
 	public object Handle;
 
 	public bool HasHandle => Handle != null;
@@ -73,7 +77,7 @@ public class CmdModelInfo<TAuto> : CmdModelInfo where TAuto : new()
 {
 	public CmdModelInfo() { }
 
-	public TAuto GetInstance(ParseResult parseRes)
+	public TAuto GetModelInstanceAndPopulateValues(ParseResult parseRes)
 	{
 		//public TAuto GetBoundValue(ParseResult parseRes) //BindingContext bindingContext)
 		//ParseResult parseRes = bindingContext.ParseResult;
@@ -85,6 +89,9 @@ public class CmdModelInfo<TAuto> : CmdModelInfo where TAuto : new()
 			CmdModelReflectionHelper.SetVal(parseRes, apg, cmdModel);
 		}
 
+		if(HasParseResultProp)
+			ParseResultSetter.Invoke(cmdModel, [parseRes]);
+
 		// LATER: make a check on TAuto if it has a prop named `ParsedResult` of this type,
 		// IF SO SET that property!! that way no need to send it in to handler and great simplication / number of handlers!
 		return cmdModel;
@@ -94,38 +101,9 @@ public class CmdModelInfo<TAuto> : CmdModelInfo where TAuto : new()
 	{
 		if(!HandleIsAsync) {
 			Cmd.SetAction(r => {
-				TAuto item = GetInstance(r);
+				TAuto item = GetModelInstanceAndPopulateValues(r);
 				Method.Invoke(item, null);
 			});
 		}
 	}
 }
-
-//if(setHandle) {
-//	object handle = OptionsClassConverter.SetHandleMethod<T>(info, cmd);
-//	if(!info.HasHandle) {
-//		// actually can be handy to have simple commands with no handle
-//		//throw new ArgumentException("Type has no handle");
-//	}
-//}
-
-//public class AutoBinder<TAuto>(CmdModelInfo autoInfo, Command cmd) where TAuto : class, new() //BinderBase<T> where T : class, new()
-//{
-//	public readonly CmdModelInfo Info = autoInfo;
-//	public readonly Command Cmd = cmd;
-
-//	public TAuto GetBoundValue(ParseResult parseRes) //BindingContext bindingContext)
-//	{
-//		TAuto item = new();
-
-//		//ParseResult parseRes = bindingContext.ParseResult;
-
-//		var props = Info.Props;
-//		for(int i = 0; i < props.Length; i++) {
-//			CmdProp apg = props[i];
-//			CmdModelReflectionHelper.SetVal(parseRes, apg, item);
-//		}
-
-//		return item;
-//	}
-//}
