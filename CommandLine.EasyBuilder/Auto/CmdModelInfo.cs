@@ -105,5 +105,13 @@ public class CmdModelInfo<TAuto> : CmdModelInfo where TAuto : new()
 				Method.Invoke(item, null);
 			});
 		}
+		else {
+			Func<ParseResult, Task> action = async r => {
+				TAuto item = GetModelInstanceAndPopulateValues(r);
+				await (Task)Method.Invoke(item, null);
+			};
+
+			Cmd.SetAction(action);
+		}
 	}
 }

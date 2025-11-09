@@ -24,6 +24,10 @@ public class CmdModelReflectionHelper
 		}
 
 		bool isVoidRetType = method.ReturnType == typeof(void);
+		bool isTaskRetType = !isVoidRetType && method.ReturnType == typeof(Task);
+
+		if(!isVoidRetType && !isTaskRetType)
+			throw new ArgumentException("Handle method must return void or Task");
 
 		info.SetHandle(method, !isVoidRetType);
 

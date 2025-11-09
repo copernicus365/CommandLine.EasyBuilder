@@ -38,29 +38,34 @@ public class FunArgs
 	[Option(name: "--fav-num")]
 	public int? FavoriteNumber { get; set; }
 
+	[Option("--delay", "-d", DefVal = 4, Description = "Delay between lines, specified as milliseconds per character in a line")]
+	public int? Delay { get; set; }
+
+	[Option("--fun", "-f", Required = true)]
+	public FunnyType Fun { get; set; } // = FunnyType.Dry;
+
+	public ParseResult ParseResult { get; set; }
+
+	public void Handle1() => PrintIt();
+
+	public async Task HandleAsync()
+	{
+		if(Delay > 0)
+			await Task.Delay(TimeSpan.FromSeconds(Delay.Value));
+		PrintIt();
+	}
+
+	public void PrintIt()
+		=> $"hi {Name} {LastName} {Fun} ({Age}) cool num {FavoriteNumber} (delay: {Delay})!".Print();
+
 	//[Argument("arg", description: "I'm an argument")]
 	//public string Arg1 { get; set; }
 
 	//[Option("--funny", DefVal = FunnyType.Dry, Description = "Foreground color of text displayed on the console")] //DefVal = ConsoleColor.White,
 	//public FunnyType? Fun { get; set; }
-
-	[Option("--delay", "-d", DefVal = 42, Description = "Delay between lines, specified as milliseconds per character in a line")]
-	public int? Delay { get; set; }
-
-	public System.CommandLine.ParseResult ParseResult { get; set; }
-
-	public void Handle()
-		=> "hi!".Print();
-
-	public async Task Handle2(ParseResult result)
-		=> "hi async!".Print();
 }
 
 public enum FunnyType { None = 0, Dry = 1, Crackup = 2 }
-
-
-
-
 
 // ---
 
