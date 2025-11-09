@@ -11,7 +11,7 @@ class Program
 	public static async Task<int> Main(string[] args)
 	{
 		bool getNew = true;
-		int progNum = 5;
+		int progNum = 6;
 
 		string appDescription = ExampleAppDescription(progNum, getNew);
 
@@ -21,6 +21,7 @@ class Program
 			//3 => new ExampleApp3(appDescription).GetApp(getNew),
 			4 => new ExampleApp4_Auto(appDescription).GetApp(),
 			5 => new ExampleApp5_Auto().GetApp(),
+			6 => new ExampleApp6_Simple().GetApp(),
 			_ => throw new ArgumentOutOfRangeException(),
 		};
 

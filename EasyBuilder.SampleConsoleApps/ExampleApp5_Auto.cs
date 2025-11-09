@@ -57,21 +57,6 @@ public class FunArgs
 
 	public void PrintIt()
 		=> $"hi {Name} {LastName} {Fun} ({Age}) cool num {FavoriteNumber} (delay: {Delay})!".Print();
-
-	//[Argument("arg", description: "I'm an argument")]
-	//public string Arg1 { get; set; }
-
-	//[Option("--funny", DefVal = FunnyType.Dry, Description = "Foreground color of text displayed on the console")] //DefVal = ConsoleColor.White,
-	//public FunnyType? Fun { get; set; }
 }
 
 public enum FunnyType { None = 0, Dry = 1, Crackup = 2 }
-
-// ---
-
-//[Command("funny", "Silly test type for dealing with default and nullable value types")]
-
-public class FunnyArgs
-{
-	public void Handle(ParseResult result) => "hi!".Print();
-}
