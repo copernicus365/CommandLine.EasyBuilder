@@ -139,6 +139,16 @@ public class CmdModelReflectionHelper
 
 			if(c.Alias.NotNulle())
 				opt.Aliases.Add(c.Alias);
+
+			if(c.AllowMultipleArgumentsPerToken)
+				opt.AllowMultipleArgumentsPerToken = true;
+		}
+
+		if(c.HelpName != null) {
+			if(isOpt)
+				opt.HelpName = c.HelpName;
+			else
+				arg.HelpName = c.HelpName;
 		}
 
 		// NEED to have default(T)

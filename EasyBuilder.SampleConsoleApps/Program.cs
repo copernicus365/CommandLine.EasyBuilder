@@ -1,5 +1,6 @@
 using System.CommandLine;
 
+using EasyBuilder.Samples.GetStarted;
 using EasyBuilder.Samples.Test1;
 
 using static System.Console;
@@ -11,7 +12,7 @@ class Program
 	public static async Task<int> Main(string[] args)
 	{
 		bool getNew = true;
-		int progNum = 6;
+		int progNum = 11;
 
 		string appDescription = ExampleAppDescription(progNum, getNew);
 
@@ -22,6 +23,8 @@ class Program
 			4 => new ExampleApp4_Auto(appDescription).GetApp(),
 			5 => new ExampleApp5_Auto().GetApp(),
 			6 => new ExampleApp6_Simple().GetApp(),
+			10 => new GetStartedTutorial().Build(),
+			11 => new GetStartedTutorialSimple().BuildEasy(), // .Build(),
 			_ => throw new ArgumentOutOfRangeException(),
 		};
 
