@@ -1,7 +1,6 @@
 using System.CommandLine;
 
 using CommandLine.EasyBuilder;
-using CommandLine.EasyBuilder.Auto;
 
 namespace EasyBuilder.Samples.Test1;
 

@@ -2,7 +2,10 @@ using System.CommandLine.Parsing;
 
 namespace CommandLine.EasyBuilder;
 
-public static class ArgParsers
+/// <summary>
+/// Extensions on `ArgumentResult` for parsing array values etc.
+/// </summary>
+public static class XArgumentResult
 {
 	/// <summary>
 	/// Use in Option constructor set to `parseArgument`,

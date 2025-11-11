@@ -5,7 +5,7 @@ using System.Reflection;
 
 using CommandLine.EasyBuilder.Private;
 
-namespace CommandLine.EasyBuilder.Auto;
+namespace CommandLine.EasyBuilder.Internal;
 
 public class CmdModelReflectionHelper
 {
@@ -101,9 +101,54 @@ public class CmdModelReflectionHelper
 		return info;
 	}
 
+	public static object TryGetOptionFromStaticMethod(PropertyInfo pi, bool isOption, Type assertExpectedType)
+	{
+		Type declaringType = pi.DeclaringType;
+		if(declaringType == null)
+			return null;
+
+		string appdx1 = isOption ? "Option" : "Argument";
+		string appdx2 = isOption ? "Opt" : "Arg";
+
+		string propName = pi.Name;
+		string[] methodNames = [$"Get{propName}{appdx1}", $"Get{propName}{appdx2}", $"Get{propName}"];
+
+		Type propertyType = pi.PropertyType;
+		Type genTyp = isOption ? typeof(Option<>) : typeof(Argument<>);
+		Type optionGenericType = genTyp.MakeGenericType(propertyType);
+
+		if(assertExpectedType != null && optionGenericType != assertExpectedType)
+			throw new ArgumentException($"Get static option or argument type is invalid for property '{propName}' ({propertyType.FullName})");
+
+		// Get static public methods
+		MethodInfo[] staticMethods = declaringType.GetMethods(BindingFlags.Static | BindingFlags.Public);
+		MethodInfo targetMethod = null;
+
+		for(int i = 0; i < methodNames.Length; i++)
+			if(setMI(methodNames[i]))
+				break;
+
+		if(targetMethod == null)
+			return null;
+
+		// Invoke static method (no instance, no args)
+		object result = targetMethod.Invoke(null, null);
+		return result; //return (Option?)result;
+
+		// Look for matching method: name matches, return type is Option<T> or Option<T>, no parameters
+		bool setMI(string methodNm)
+		{
+			targetMethod = staticMethods
+				 .Where(m => m.ReturnType == optionGenericType)
+				 .Where(m => m.GetParameters().Length == 0)
+				 .FirstOrDefault(m => m.Name == methodNm);
+			return targetMethod != null;
+		}
+	}
+
 	static CmdProp GetCmdProperties(PropertyInfo pi)
 	{
-		CommandLineValueAttribute c = pi.GetCustomAttribute(typeof(CommandLineValueAttribute), true) as CommandLineValueAttribute;
+		CLPropertyAttribute c = pi.GetCustomAttribute(typeof(CLPropertyAttribute), true) as CLPropertyAttribute;
 
 		OptionAttribute optattr = c as OptionAttribute;
 		bool isOpt = optattr != null;
@@ -124,6 +169,28 @@ public class CmdModelReflectionHelper
 		Option opt = null;
 		Argument arg = null;
 
+		bool optionComesFromDirectStaticMethod = c.Name.IsNulle();
+		if(optionComesFromDirectStaticMethod) {
+			object objFromSt = TryGetOptionFromStaticMethod(pi, isOpt, constructedGenType);
+			if(objFromSt == null)
+				throw new InvalidOperationException($"Property '{pi.Name}' is marked to get {(isOpt ? "Option" : "Argument")} from static method, but no valid static method found.");
+
+			if(isOpt) {
+				opt = objFromSt as Option;
+				c.Name = opt.Name;
+			}
+			else {
+				arg = objFromSt as Argument;
+				c.Name = arg.Name;
+			}
+
+			CmdProp prop1 = new(propTyp, isNullable, pi, c, opt, arg, defaultOfTVal: null);
+			return prop1;
+			// ??? defaultOfTVal: null);
+			// I believe CommandLineValueAttribute attr.defaultOfTVal is only used when c.DefVal is set
+			// (below = hasDefPropSet). Since we don't of course, is OK *i think* to keep null
+		}
+
 		if(isOpt) {
 			opt = Activator.CreateInstance(constructedGenType, c.Name) as Option;
 			opt.Description = c.Description;
@@ -131,6 +198,19 @@ public class CmdModelReflectionHelper
 		else {
 			arg = Activator.CreateInstance(constructedGenType, c.Name) as Argument;
 			arg.Description = c.Description;
+		}
+
+		if(c.MinArity > 0 || c.MaxArity > 0) {
+			int min = c.MinArity;
+			int max = c.MaxArity;
+			if(min < 0 || max < min)
+				throw new ArgumentOutOfRangeException("MinArgs or MaxArgs values out of range");
+
+			ArgumentArity arity = new(min, max);
+			if(isOpt)
+				opt.Arity = arity;
+			else
+				arg.Arity = arity;
 		}
 
 		if(isOpt) {
@@ -193,8 +273,8 @@ public class CmdModelReflectionHelper
 			//	arg.SetDefaultValue(c.DefVal);
 		}
 
-		CmdProp vv = new(propTyp, isNullable, pi, c, opt, arg, defaultT);
-		return vv;
+		CmdProp prop = new(propTyp, isNullable, pi, c, opt, arg, defaultT);
+		return prop;
 	}
 
 	static Delegate GetArgResFuncReturnsObjectVal(Type genericPropTyp, object val)
@@ -233,7 +313,7 @@ public class CmdModelReflectionHelper
 			// NOTE #0
 		}
 
-		bool hasDefVal = p.attr.DefVal != null;
+		bool hasDefVal = p.attr.DefVal != null; // CommandLineValueAttribute attr
 		if(!hasDefVal) {
 
 		}
@@ -259,50 +339,3 @@ public class CmdModelReflectionHelper
 		p.pi.SetValue(item, value);
 	}
 }
-
-#region --- SetVal notes ---
-
-// NOTE #0:
-// FIXED! It was our own prob... i think... WE were REGISTERING nullable properties as not nullable 
-//// FIX PROBLEM: for nullable value type (eg `int?` property) lib is
-//// returning a set default value eg `0` instead of NULL!!
-//if(value != null && value.Equals(p.defaultOfTVal)) {
-//	var tt1 = parseRes.Tokens.FirstOrDefault(t => t.Type == TokenType.Option && t.Value != null);
-//	value = null;
-//}
-
-// NOTE #1
-// IN THIS CASE, *especially* for BOOLs(!), we HAVE to know if the option EXISTED in the input
-// otherwise there's NO WAY to know if DefVal should be used
-// Token tkn = parseRes.Tokens.FirstOrDefault(t =>
-
-// NOTE #2
-// WHOA, bug in System.CommandLine! CanNOT test the most simplest of test, for obj == null! -> `tkn == null`
-// Looks like they have an op_Equality BUG that THROWS test for null
-//tkn == null
-//'tkn == null' threw an exception of type 'System.NullReferenceException'
-//    Data: {System.Collections.ListDictionaryInternal}
-//    HResult: -2147467261
-//    HelpLink: null
-//    InnerException: null
-//    Message: "Object reference not set to an instance of an object."
-//    Source: "System.CommandLine"
-//    StackTrace: "   at System.CommandLine.Parsing.Token.op_Equality(Token left, Token right)"
-//    TargetSite: {Boolean op_Equality(System.CommandLine.Parsing.Token, System.CommandLine.Parsing.Token)}
-
-#endregion
-
-#region --- Foo test ---
-
-//class Foo { public string Name { get; set; } }
-
-//class Foo<T> : Foo { public Func<T> GetVal { get; set; } }
-
-//static void SetStuff(Type genericPropTyp, string name)
-//{
-//	Type constructedGenType = typeof(Foo<>).MakeGenericType(genericPropTyp);
-//	Foo opt = Activator.CreateInstance(constructedGenType) as Foo;
-//	opt.Name = name;
-//}
-
-#endregion
