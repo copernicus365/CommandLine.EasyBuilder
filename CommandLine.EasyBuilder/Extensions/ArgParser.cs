@@ -5,7 +5,7 @@ namespace CommandLine.EasyBuilder;
 /// <summary>
 /// Extensions on `ArgumentResult` for parsing array values etc.
 /// </summary>
-public static class XArgumentResult
+public static class ArgParser
 {
 	/// <summary>
 	/// Use in Option constructor set to `parseArgument`,
@@ -13,22 +13,22 @@ public static class XArgumentResult
 	/// integer array.
 	/// </summary>
 	/// <param name="arg">Arg</param>
-	public static int[] IntArray(ArgumentResult arg)
+	public static int[] IntArray(this ArgumentResult arg)
 		=> ArrayParser(arg, str => int.TryParse(str, out int val) ? (int?)val : null);
 
-	public static double[] DoubleArray(ArgumentResult arg)
+	public static double[] DoubleArray(this ArgumentResult arg)
 		=> ArrayParser(arg, str => double.TryParse(str, out double val) ? (double?)val : null);
 
 	public static double[] DoubleArray(string val, out string error)
 		=> ArrayParser(val, str => double.TryParse(str, out double val) ? (double?)val : null, out error);
 
-	public static long[] LongArray(ArgumentResult arg)
+	public static long[] LongArray(this ArgumentResult arg)
 		=> ArrayParser(arg, str => long.TryParse(str, out long val) ? (long?)val : null);
 
-	public static decimal[] DecimalArray(ArgumentResult arg)
+	public static decimal[] DecimalArray(this ArgumentResult arg)
 		=> ArrayParser(arg, str => decimal.TryParse(str, out decimal val) ? (decimal?)val : null);
 
-	public static T[] ArrayParser<T>(ArgumentResult arg, Func<string, T?> conv) where T : struct
+	public static T[] ArrayParser<T>(this ArgumentResult arg, Func<string, T?> conv) where T : struct
 	{
 		string str = arg.Tokens.Single().Value; //?.Trim();
 		T[] res = ArrayParser<T>(arg.Tokens.Single().Value, conv, out string err);

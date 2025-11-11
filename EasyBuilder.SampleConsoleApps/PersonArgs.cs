@@ -23,7 +23,7 @@ public class PersonArgs
 	[Option("--durations", "-durs", Description = "Person's age", Required = true)]
 	public string DurationsArg {
 		get => Durations.JoinToString(",");
-		set => Durations = XArgumentResult.DoubleArray(value, out string err);
+		set => Durations = ArgParser.DoubleArray(value, out string err);
 	}
 
 	public double[] Durations { get; set; }
