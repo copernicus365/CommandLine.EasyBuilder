@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>EasyBuilder.Samples</RootNamespace>
     <Nullable>disable</Nullable>
@@ -30,7 +30,7 @@
 
   <ItemGroup>
     <!--<ProjectReference Include="..\..\CommandLine\command-line-api-vcool\System.CommandLine\System.CommandLine.csproj" />-->
-    <PackageReference Include="System.CommandLine" Version="2.0.0-rc.2.25502.107" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>

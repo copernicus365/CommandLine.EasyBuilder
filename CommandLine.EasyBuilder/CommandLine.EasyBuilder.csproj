@@ -2,10 +2,11 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net10.0</TargetFramework>
-    <VersionPrefix>1.9</VersionPrefix>
-    <VersionSuffix>beta1.1</VersionSuffix>
-    <!-- OR: <Version>1.9-beta1.1</Version> -->
+    <!-- keeping net8.0, as the bran new (2025-11-11) System.CommandLine 2.0.0, despite released on day of net10.0 launch, has net8.0 dep -->
+    <TargetFramework>net8.0</TargetFramework>
+    <VersionPrefix>1.10</VersionPrefix>
+    <VersionSuffix>beta1.0</VersionSuffix>
+    <!-- OR: <Version>1.10-beta1.0</Version> -->
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <RootNamespace>CommandLine.EasyBuilder</RootNamespace>
@@ -32,7 +33,7 @@
 
   <ItemGroup>
     <!--<ProjectReference Include="..\..\CommandLine\command-line-api-vcool\System.CommandLine\System.CommandLine.csproj" />-->
-    <PackageReference Include="System.CommandLine" Version="2.0.0-rc.2.25502.107" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0" />
   </ItemGroup>
 
 </Project>
