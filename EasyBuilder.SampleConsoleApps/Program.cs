@@ -39,7 +39,7 @@ class Program
 	{
 		int progNum = 1;
 		RootCommand root = progNum switch {
-			1 => ExampleApp_HellowWorld.GetApp(),
+			1 => ExampleApp_HelloWorld.GetApp(),
 			2 => new A.ExampleApp_ReadCmd().GetApp(),
 			3 => new ExampleApp_Person().GetApp(),
 			4 => new ExampleApp_Fun().GetApp(),

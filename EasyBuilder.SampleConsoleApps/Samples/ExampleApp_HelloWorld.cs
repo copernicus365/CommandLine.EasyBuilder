@@ -6,7 +6,7 @@ using static System.Console;
 
 namespace EasyBuilder.Samples;
 
-public class ExampleApp_HellowWorld
+public class ExampleApp_HelloWorld
 {
 	public static RootCommand GetApp()
 	{
