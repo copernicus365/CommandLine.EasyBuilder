@@ -1,91 +1,185 @@
 # CommandLine.EasyBuilder
 
-Extending upon the terrific `System.CommandLine` library, `CommandLine.EasyBuilder` offers a more functional and user friendly way of building up `System.CommandLine`'s types. While `System.CommandLine` is a very solid library that is a joy to use once it is running, the one glaring problem is when one is on the end of specifying or building it up. On that front there is much to be desired.
-
-The bad thing about that is, I envision command-line apps could start taking pride of place in the dotnet world, where many console apps could simply and easily be converted to being command-line apps (note: command-line apps do *not* have to be a single run thing, nor do they have to take their arguments from Main's args. And nor do they have to auto close after running once. In fact they can just as easily be run in a loop with new input per round just as easily, actually, simply identically, as we do with console apps.)
-
-But currently, in my view people aren't going to do this nearly as often as they would because of the mundane and tedious manner in which `System.CommandLine` requires in order to specifiy and build up the command line parameters.
-
-## Examples
-
-Before: to specify a single `Option<T>`, note how one can't just set an option as if it were a single property within a bigger class (in this case: `Command`). It would be as if when building a C# class, to add a property (which corresponds to an option), before the class is even specified, you have to make a standalone property 30 lines beforehand, and then 30 lines later, ADD that property to that class. And THEN 30 or so lines later, again add the property variable into a handler when one needs to call a function... DISJOINTED INSANITY! (I hope no one's offended here: I fully understand why these things weren't added yet: Because 1. it was hard to do, and 2. often such things impose limitations, or require compromises, things which the mainstream library may not want want to hastle with).
-
-So let's consider one example, focusing on a single option, highlight the variable **`delayOption`**:
-
-OLD:
+Building upon the terrific `System.CommandLine`, `CommandLine.EasyBuilder` makes it easier than ever to make a command line app, offering view-model type auto-binding of input command-line options and arguments onto the properties of a POCO class. Simply decorate a class with a `Command` attribute, and decorate any of its properties with `Option` or `Argument` attributes, and quite literally, `CommandLine.EasyBuilder` takes care of the rest! More often than not this can replace the need to manually wire up via the traditional way. This also makes your command-line much easier to understand, to edit and to alter, and so forth. It's basically declarative decorations on a class and it's properties, building on top of all the tremendous work that `System.CommandLine` already does.
 
 ```csharp
-Option<double> delayOption = new(
-	name: "--delay",
-	description: "Delay between lines, specified as milliseconds per character in a line.",
-	getDefaultValue: () => 42);
+using System.CommandLine;
+using CommandLine.EasyBuilder;
+using static System.Console;
 
-delayOption.AddAlias("-d");
+namespace EasyBuilder.Samples;
 
-//...
-
-Command readCmd = new("read", "Read and display the file.") {
-	fileOption,
-	delayOption,
-	fgcolorOption,
-	lightModeOption
-};
-
-readCmd.SetHandler(async (file, fgcolor, delay, lightMode) => {
-	await ReadFile(file!, delay, fgcolor, lightMode);
-},
-	fileOption, fgcolorOption, delayOption, lightModeOption);
-
-```
-
-NEW:
-
-```csharp
-Command readCmd = new Command("read", "Read and display the file.").Init(
-	new Option<double>(
-		name: "--delay",
-		description: "Delay between lines, specified as milliseconds per character in a line.",
-		getDefaultValue: () => 42)
-		.Alias("-d"),
-	handle: async (file, fgcolor, delay, lightMode) => {
-		await ReadFile(file!, fgcolor, delay, lightMode);
-	},
-	rootCmd);
-```
-
-No duplications, all DRY! All far more functional, while in this way loosing virtually nothing. You can just as well for example build that option as a separate variable still.
-
-There are multiple full examples like this in the sample library. It is true that this way takes far fewer lines of code (almost half), but more key is the cognitive simplification and decrease in repetition.
-
-## Auto Examples
-
-Even better, we now have what I'm calling `Auto` types, by means of class and property attributes, in order to make this even simpler and cleaner, all while, very importantly, simply compiling down to the same `System.CommandLine` types (i.e. `Option<T>`, `Argument<T>`, `Command<T>`, etc.
-
-```csharp
-[Command(
-	"read",
-	"Read and display the file")]
-public class ReadArgs
+public class ExampleApp_HelloWorld
 {
-	[Option(
-		"--delay", "-d",
-		description: "Delay between lines, specified as milliseconds per character in a line",
-		DefVal = 42.0)]
-	public double? Delay { get; set; }
+	public static RootCommand GetApp()
+	{
+		RootCommand rootCmd = new("Command line is cool");
+		rootCmd.AddAutoCommand<HellowWorld>();
+		return rootCmd;
+	}
+}
 
-	public async Task Handle()
-		=> await ReadFile(file!, fgcolor, delay, lightMode);
+[Command("hello", "Hello commandline world!")]
+public class HellowWorld
+{
+	[Option("--name", "-n", Required = true)]
+	public string Name { get; set; }
+
+	[Option(name: "--age", DefVal = 42)]
+	public int Age { get; set; }
+
+	[Option("--animal", "-a", Required = true)]
+	public FavoriteAnimal FavAnimal { get; set; } = FavoriteAnimal.Cheetah;
+
+	public void Handle()
+		=> WriteLine($"Hello {Name} ({Age}), glad to see you love {FavAnimal}s!");
+}
+
+public enum FavoriteAnimal { None = 0, Dog = 1, Cat = 2, Cheetah = 3, Rhino = 4 }
+```
+
+In this example, simply add this class to a `Rootcommand` (or sub-command `Command`): `rootCmd.AddAutoCommand<HelloWorld>()`, and all the magic is taken care of. From there, run the traditional way, once you have a `Rootcommand`. We're not demonstrating that here, because none of that changes, but you can see the example app.
+
+Add either a `void Handle` or `Task HandleAsync` method to your POCO class, and they will be auto-found and called when `Invoke` or `InvokeAsync` is called on the `ParseResult` (ie same as usual).
+
+Other examples are shown in the `EasyBuilder.SampleConsoleApps` app.
+
+For a larger example, see `GetStartedTutorialSimple.cs` shown below. This takes the final app demonstrated in this `System.CommandLine` [getting started tutorial](https://learn.microsoft.com/en-us/dotnet/standard/commandline/get-started-tutorial), but instead builds it in the `CommandLine.EasyBuilder` style with POCO command classes. This example with inline comments can serve as documentation for a number of scenarios.
+
+```csharp
+using System.CommandLine;
+using CommandLine.EasyBuilder;
+using static System.Console;
+using FileIO = System.IO.File;
+
+namespace EasyBuilder.Samples;
+
+public class GetStartedTutorial_Auto
+{
+	public RootCommand GetApp()
+	{
+		RootCommand rootCmd = new("Sample app for System.CommandLine");
+
+		Command quotesCmd = rootCmd.AddAutoCommand<QuotesCmd>();
+
+		Command readCmd = quotesCmd.AddAutoCommand<ReadCmd>();
+		quotesCmd.AddAutoCommand<DeleteCmd>();
+		quotesCmd.AddAutoCommand<AddCmd>();
+
+		ShowExtraOptions(readCmd);
+
+		return rootCmd;
+	}
+
+	/// <summary>Demonstrates how to modify auto constructed options / arguments</summary>
+	void ShowExtraOptions(Command readCmd)
+	{
+		readCmd.Options.First(o => o.Name == "--fgcolor").Alias("-fg");
+
+		// example if you need the fully generic typed version eg Option<T> ...
+		Option<bool> opt = readCmd.Options.First(o => o.Name == "--light-mode") as Option<bool>;
+		opt.Alias("-lm");
+		//opt.Arity = new ArgumentArity(0, 2);
+	}
+}
+
+[Command("quotes", "Work with a file that contains quotes.")]
+public class QuotesCmd { }
+
+[Command("read", "Read and display the file.")]
+public class ReadCmd : FileBase
+{
+	[Option("--delay", "-d", "Delay between lines, specified as milliseconds per character in a line.", DefVal = 42)] // Arity = ArgumentArity.Zero)]
+	public int Delay { get; set; }
+
+	[Option("--fgcolor", description: "Foreground color of text displayed on the console.", DefVal = ConsoleColor.White, MaxArity = 3)]
+	public ConsoleColor FGColor { get; set; }
+
+	[Option("--light-mode", description: "Background color of text displayed on the console: default is black, light mode is white.")]
+	public bool LightMode { get; set; }
+
+	public void Handle()
+	{
+		BackgroundColor = LightMode ? ConsoleColor.White : ConsoleColor.Black;
+		ForegroundColor = FGColor;
+
+		foreach(string line in FileIO.ReadLines(File.FullName)) {
+			WriteLine(line);
+			Thread.Sleep(TimeSpan.FromMilliseconds(Delay * line.Length));
+		}
+		ResetColor(); // Improvement: Reset console colors to avoid affecting future output
+	}
+}
+
+[Command("delete", "Delete lines from the file.")]
+public class DeleteCmd : FileBase
+{
+	[Option("--search-terms", description: "Strings to search for when deleting entries.", Required = true, AllowMultipleArgumentsPerToken = true)]
+	public string[] SearchTerms { get; set; }
+
+	public async Task HandleAsync() // auto looks for a `Handle` or else a `HandleAsync` method
+	{
+		if(!FileExists())
+			return;
+
+		WriteLine("Deleting from file");
+		var lines = FileIO.ReadLines(File.FullName).Where(line => SearchTerms.All(s => !line.Contains(s))).ToArray();
+		FileIO.WriteAllLines(File.FullName, lines);
+	}
+}
+
+[Command("add", "Add an entry to the file.", Alias = "insert")]
+public class AddCmd : FileBase
+{
+	[Argument("quote", "Text of quote.")]
+	public string Quote { get; set; }
+
+	[Argument("byline", "Byline of quote.")]
+	public string Byline { get; set; }
+
+	public void Handle()
+	{
+		if(!FileExists())
+			return;
+
+		WriteLine("Adding to file");
+
+		using StreamWriter writer = File.AppendText();
+		writer.WriteLine($"{Environment.NewLine}{Environment.NewLine}{Quote}");
+		writer.WriteLine($"{Environment.NewLine}-{Byline}");
+	}
+}
+
+public class FileBase
+{
+	/// <summary>Enter "" for `name` to use static method for getting Option or Argument (see below)</summary>
+	[Option<FileInfo>("")]
+	public FileInfo File { get; set; }
+
+	/// <summary>
+	/// For advanced options needing a direct Option or Argument (needed for some features like DefaultValueFactory),
+	/// make a static function named `Get{PropName}`. May prefix with 'Option' or 'Opt" / "Argument" or "Arg".
+	/// </summary>
+	public static Option<FileInfo> GetFileOption() =>
+		new("--file", "-f") {
+			Description = "An option whose argument is parsed as a FileInfo",
+			Required = true,
+			DefaultValueFactory = result => {
+				if(result.Tokens.Count == 0)
+					return new FileInfo("sampleQuotes.txt");
+
+				string filePath = result.Tokens.Single().Value;
+				if(FileIO.Exists(filePath))
+					return new FileInfo(filePath);
+
+				result.AddError("File does not exist");
+				return null;
+			}
+		};
+
+	public bool FileExists() => File != null && File.Exists;
+
+	/// <summary>Get access to `ParseResult`: make a property named `ParseResult` or `ParsedResult`</summary>
+	public ParseResult ParseResult { get; set; }
 }
 ```
-
-To then use the above class to build it into a command line, it is literally as simple as this:
-
-```csharp
-RootCommand rcmd = new("Who said command line isn't cool?!");
-
-rcmd.AddAutoCommand<ReadArgs>();
-```
-
-I would like to strongly emphasize this again: Beyond building the app with these new functional and POCO type classes, *everything* then builds down to the same types: `Option<T>`, `Argument<T>`, `Command<T>` etc. One can then do the same with those types as they ever would have done with `System.CommandLine`.
-
-As an aside: *personally* I would argue that the classes one uses for specifying the app, like `ReadArgs` above, are better to be seen as a DTO / data transfer object types like we see in the web and ASP.NET world. In other words, probably better to let the `ReadArgs` class be limited to the singular problem of taking initial input from the command line for any more serious use case.
