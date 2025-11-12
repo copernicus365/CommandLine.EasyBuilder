@@ -60,6 +60,7 @@ public class GetStartedTutorialSimple
 				WriteLine(line);
 				Thread.Sleep(TimeSpan.FromMilliseconds(Delay * line.Length));
 			}
+			Console.ResetColor(); // Improvement: Reset console colors to avoid affecting future output
 		}
 	}
 
