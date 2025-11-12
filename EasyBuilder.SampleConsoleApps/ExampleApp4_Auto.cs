@@ -4,11 +4,11 @@ using CommandLine.EasyBuilder;
 
 namespace EasyBuilder.Samples.Test1;
 
-public class ExampleApp4_Auto(string appDescription)
+public class ExampleApp4_Auto()
 {
 	public RootCommand GetApp()
 	{
-		RootCommand rootCmd = new(appDescription);
+		RootCommand rootCmd = [];
 		rootCmd.AddAutoCommand<ReadArgs>();
 
 		Option<FileInfo> nameOpt = new Option<FileInfo>("--file")
