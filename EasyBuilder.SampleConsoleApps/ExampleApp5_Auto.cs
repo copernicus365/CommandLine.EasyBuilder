@@ -1,7 +1,6 @@
 using System.CommandLine;
 
 using CommandLine.EasyBuilder;
-using CommandLine.EasyBuilder.Auto;
 
 namespace EasyBuilder.Samples.Test1;
 
@@ -12,7 +11,7 @@ public class ExampleApp5_Auto
 		RootCommand rootCmd = new("Cool app!");
 
 		Command teachCmd = new("teach", "Ben Stein says teach this well");
-		rootCmd.AddCommand(teachCmd);
+		rootCmd.Subcommands.Add(teachCmd);
 
 		teachCmd.AddAutoCommand<FunArgs>();
 
@@ -23,29 +22,40 @@ public class ExampleApp5_Auto
 [Command("fun", "Silly test type for dealing with default and nullable value types")]
 public class FunArgs
 {
-	[Option(
-		"--last-name",
-		"-ln",
-		description: "Bogus last name",
-		DefVal = "Fergy"
-		//Required = true
-		)]
-		public string LastName { get; set; }
-
-	[Argument("arg", description: "I'm an argument")]
-	public string Arg1 { get; set; }
-
-	[Option("--name", "-n", DefVal = "Charlie Brown")]
+	[Option("--name", "-n", DefVal = "Charlie")]
 	public string Name { get; set; }
 
-	[Option("--funny", DefVal = FunnyType.Dry, Description = "Foreground color of text displayed on the console")] //DefVal = ConsoleColor.White,
-	public FunnyType? Fun { get; set; }
+	[Option(name: "--last-name", alias: "-ln", description: "Bogus last name", Required = true)]
+	public string LastName { get; set; }
 
-	[Option("--delay", "-d", DefVal = 42, Description = "Delay between lines, specified as milliseconds per character in a line")]
-	public double? Delay { get; set; }
+	[Option(name: "--pw", alias: "-p", Required = true)]
+	public string Pword { get; set; }
 
-	public void Handle()
-		=> $"Hello {Name} {LastName}, you are {Fun} funny type, with {Delay} delay. And oh, arg = `{Arg1?.ToUpper()}`".Print();
+	[Option(name: "--age", DefVal = 47)]
+	public int Age { get; set; }
+
+	[Option(name: "--fav-num")]
+	public int? FavoriteNumber { get; set; }
+
+	[Option("--delay", "-d", DefVal = 4, Description = "Delay between lines, specified as milliseconds per character in a line")]
+	public int? Delay { get; set; }
+
+	[Option("--fun", "-f", Required = true)]
+	public FunnyType Fun { get; set; } // = FunnyType.Dry;
+
+	public ParseResult ParseResult { get; set; }
+
+	public void Handle1() => PrintIt();
+
+	public async Task HandleAsync()
+	{
+		if(Delay > 0)
+			await Task.Delay(TimeSpan.FromSeconds(Delay.Value));
+		PrintIt();
+	}
+
+	public void PrintIt()
+		=> $"hi {Name} {LastName} {Fun} ({Age}) cool num {FavoriteNumber} (delay: {Delay})!".Print();
 }
 
 public enum FunnyType { None = 0, Dry = 1, Crackup = 2 }

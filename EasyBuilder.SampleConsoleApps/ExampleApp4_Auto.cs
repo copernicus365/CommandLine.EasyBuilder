@@ -1,7 +1,6 @@
 using System.CommandLine;
 
 using CommandLine.EasyBuilder;
-using CommandLine.EasyBuilder.Auto;
 
 namespace EasyBuilder.Samples.Test1;
 
@@ -12,9 +11,9 @@ public class ExampleApp4_Auto(string appDescription)
 		RootCommand rootCmd = new(appDescription);
 		rootCmd.AddAutoCommand<ReadArgs>();
 
-		Option<FileInfo> nameOpt = new Option<FileInfo>("--file", description: "Display some file..")
+		Option<FileInfo> nameOpt = new Option<FileInfo>("--file")
 			.Alias("-f");
-
+		nameOpt.Description = "Display some file..";
 
 		//rootCmd.AddAutoCommand((ReadArgs w) => w.Handle());
 		return rootCmd;
