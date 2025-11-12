@@ -1,9 +1,21 @@
+using System.CommandLine;
+
 using CommandLine.EasyBuilder;
 
-namespace EasyBuilder.Samples.Test1;
+namespace EasyBuilder.Samples;
 
-[Command("dude", "Coolio a person man...")]
-public class PersonArgs
+public class ExampleApp_Person()
+{
+	public RootCommand GetApp()
+	{
+		RootCommand rootCmd = [];
+		rootCmd.AddAutoCommand<PersonCmd>();
+		return rootCmd;
+	}
+}
+
+[Command("person", "Coolio person...")]
+public class PersonCmd
 {
 	[Option("--first-name", "-fn", Required = true, Description = "Person's first name")]
 	public string FirstName { get; set; }
@@ -27,4 +39,7 @@ public class PersonArgs
 	}
 
 	public double[] Durations { get; set; }
+
+	public void Handle()
+		=> Console.WriteLine($"Person: {FirstName} {LastName}, Age: {Age}, FavNum: {FavNumber}, Durs: {Durations?.JoinToString(",")}");
 }

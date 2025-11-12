@@ -4,9 +4,9 @@ using CommandLine.EasyBuilder;
 
 using static System.Console;
 
-namespace EasyBuilder.Samples.Test1;
+namespace EasyBuilder.Samples;
 
-public class ExampleApp7
+public class ExampleApp_HellowWorld
 {
 	public static RootCommand GetApp()
 	{

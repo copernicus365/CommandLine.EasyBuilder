@@ -2,7 +2,7 @@ using System.CommandLine;
 
 namespace EasyBuilder.Samples;
 
-public class GetStartedTutorial
+public class GetStartedTutorial_Original
 {
 	public RootCommand Build()
 	{

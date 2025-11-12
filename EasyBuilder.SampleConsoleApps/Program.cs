@@ -1,8 +1,5 @@
 using System.CommandLine;
 
-using EasyBuilder.Samples.GetStarted;
-using EasyBuilder.Samples.Test1;
-
 using static System.Console;
 
 namespace EasyBuilder.Samples;
@@ -34,18 +31,20 @@ class Program
 			}
 
 			int dRes = await res.InvokeAsync();
+			WriteLine();
 		} while(true);
 	}
 
 	public static RootCommand GetApp(string[] args)
 	{
-		int progNum = 7;
+		int progNum = 1;
 		RootCommand root = progNum switch {
-			4 => new ExampleApp4_Auto().GetApp(),
-			5 => new ExampleApp5_Auto().GetApp(),
-			7 => ExampleApp7.GetApp(),
-			10 => new GetStartedTutorial().Build(),
-			11 => new GetStartedTutorialSimple().BuildEasy(),
+			1 => ExampleApp_HellowWorld.GetApp(),
+			2 => new A.ExampleApp_ReadCmd().GetApp(),
+			3 => new ExampleApp_Person().GetApp(),
+			4 => new ExampleApp_Fun().GetApp(),
+			5 => new GetStartedTutorial_Original().Build(),
+			6 => new GetStartedTutorial_Auto().GetApp(),
 			_ => throw new ArgumentOutOfRangeException(),
 		};
 		return root;

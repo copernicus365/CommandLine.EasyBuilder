@@ -2,14 +2,14 @@ using System.CommandLine;
 
 using CommandLine.EasyBuilder;
 
-namespace EasyBuilder.Samples.Test1;
+namespace EasyBuilder.Samples.A;
 
-public class ExampleApp4_Auto()
+public class ExampleApp_ReadCmd()
 {
 	public RootCommand GetApp()
 	{
 		RootCommand rootCmd = [];
-		rootCmd.AddAutoCommand<ReadArgs>();
+		rootCmd.AddAutoCommand<ReadCmd>();
 
 		Option<FileInfo> nameOpt = new Option<FileInfo>("--file")
 			.Alias("-f");
@@ -20,31 +20,19 @@ public class ExampleApp4_Auto()
 	}
 }
 
-[Command(
-	"read",
-	"Read and display the file")]
-public class ReadArgs
+[Command("read", "Read and display the file")]
+public class ReadCmd
 {
-	[Option(
-		"--delay", "-d",
-		DefVal = 42.0,
-		Description = "Delay between lines, specified as milliseconds per character in a line")]
+	[Option("--delay", "-d", DefVal = 42.0, Description = "Delay between lines, specified as milliseconds per character in a line")]
 	public double? Delay { get; set; }
 
-	[Option(
-		"--fgcolor",
-		description: "Foreground color of text displayed on the console")] //DefVal = ConsoleColor.White,
+	[Option("--fgcolor", description: "Foreground color of text displayed on the console")] //DefVal = ConsoleColor.White,
 	public ConsoleColor Foreground { get; set; }
 
-	[Option(
-		"--light-mode",
-		description: "Background color of text displayed on the console: default is black, light mode is white")]
+	[Option("--light-mode", description: "Background color of text displayed on the console: default is black, light mode is white")]
 	public bool? Lightmode { get; set; }
 
-	[Option(
-		"--file", "-f",
-		Required = true,
-		Description = "The file to read and display on the console")]
+	[Option("--file", "-f", Required = true, Description = "The file to read and display on the console")]
 	public FileInfo File { get; set; }
 
 	public async Task Handle()
@@ -54,13 +42,12 @@ public class ReadArgs
 		}
 		if(Foreground != default)
 			Console.ForegroundColor = Foreground;
-		//Foreground = ConsoleColor.
 
 		List<string> lines = System.IO.File.ReadLines(File.FullName).ToList();
 
 		foreach(string line in lines) {
 			Console.WriteLine(line);
 			await Task.Delay(TimeSpan.FromMilliseconds(Delay.Value * line.Length));
-		};
+		}
 	}
 }

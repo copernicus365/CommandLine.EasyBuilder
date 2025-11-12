@@ -2,9 +2,9 @@ using System.CommandLine;
 
 using CommandLine.EasyBuilder;
 
-namespace EasyBuilder.Samples.Test1;
+namespace EasyBuilder.Samples;
 
-public class ExampleApp5_Auto
+public class ExampleApp_Fun
 {
 	public RootCommand GetApp()
 	{
