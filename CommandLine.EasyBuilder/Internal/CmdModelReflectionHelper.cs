@@ -3,10 +3,12 @@ using System.CommandLine.Parsing;
 using System.Linq.Expressions;
 using System.Reflection;
 
-using CommandLine.EasyBuilder.Private;
-
 namespace CommandLine.EasyBuilder.Internal;
 
+/// <summary>
+/// A big heavy hitter, handles much of the reflection magic needed to make this work.
+/// All members here are reflection related.
+/// </summary>
 public class CmdModelReflectionHelper
 {
 	public static CommandAttribute GetCommandAttribute<T>()
@@ -14,7 +16,7 @@ public class CmdModelReflectionHelper
 
 	public static object SetHandleMethod(CmdModelInfo info)
 	{
-		Type type = info.Type; // typeof(TAuto);
+		Type type = info.Type;
 
 		MethodInfo method = type.GetMethod("Handle");
 		if(method == null) {
@@ -36,38 +38,6 @@ public class CmdModelReflectionHelper
 
 		object _handle = null;
 		return _handle;
-
-		//if(isVoidRetType) {
-		//	// auto gen IGNore
-		//	//Action<ParseResult> act1 = (pr) => {
-		//	//	object inst = Activator.CreateInstance(type);
-		//	//	method.Invoke(inst, [pr]);
-		//	//};
-
-		//	Action<TAuto, ParseResult> handle = (TAuto v, ParseResult pr) => {
-		//		info.Method.Invoke(v, [pr]);
-		//	};
-
-		//	Action<ParseResult> act1 = (pr) => {
-		//		handle
-		//		////TAuto inst = Activator.CreateInstance<TAuto>();
-		//		//method.Invoke(inst, [pr]);
-		//	};
-
-		//	_handle = handle;
-		//	//cmd.SetAction(
-		//}
-		//else {
-		//	throw new NotImplementedException();
-		//	//Func<TAuto, Task> handle = async (TAuto v) => {
-		//	//	object res = info.Method.Invoke(v, null);
-		//	//	Task result = res as Task;
-		//	//	await result;
-		//	//};
-		//	//_handle = handle;
-		//}
-
-		//info.SetHandle(_handle);
 	}
 
 	public static CmdModelInfo<T> GetCmdModelInfo<T>(bool throwIfNull = true) where T : class, new()
@@ -162,14 +132,12 @@ public class CmdModelReflectionHelper
 		Type propTypeFromNullable = !propTyp.IsValueType ? null : Nullable.GetUnderlyingType(propTyp);
 
 		bool isNullable = propTypeFromNullable != null;
-		//if(isNullable)
-		//	propTyp = propTypeFromNullable; // <<< ERROR! messed up things, is fine ... I think ... w/out
 
 		Type constructedGenType = (isOpt ? typeof(Option<>) : typeof(Argument<>)).MakeGenericType(propTyp);
 		Option opt = null;
 		Argument arg = null;
 
-		bool optionComesFromDirectStaticMethod = c.Name.IsNulle();
+		bool optionComesFromDirectStaticMethod = string.IsNullOrEmpty(c.Name);
 		if(optionComesFromDirectStaticMethod) {
 			object objFromSt = TryGetOptionFromStaticMethod(pi, isOpt, constructedGenType);
 			if(objFromSt == null)
@@ -186,9 +154,6 @@ public class CmdModelReflectionHelper
 
 			CmdProp prop1 = new(propTyp, isNullable, pi, c, opt, arg, defaultOfTVal: null);
 			return prop1;
-			// ??? defaultOfTVal: null);
-			// I believe CommandLineValueAttribute attr.defaultOfTVal is only used when c.DefVal is set
-			// (below = hasDefPropSet). Since we don't of course, is OK *i think* to keep null
 		}
 
 		if(isOpt) {
@@ -217,7 +182,7 @@ public class CmdModelReflectionHelper
 			if(c.Required == true)
 				opt.Required = true;
 
-			if(c.Alias.NotNulle())
+			if(!string.IsNullOrEmpty(c.Alias))
 				opt.Aliases.Add(c.Alias);
 
 			if(c.AllowMultipleArgumentsPerToken)
@@ -254,23 +219,6 @@ public class CmdModelReflectionHelper
 			Delegate dlg = GetArgResFuncReturnsObjectVal(propTyp, c.DefVal);
 			PropertyInfo getValProp = constructedGenType.GetProperty("DefaultValueFactory");
 			getValProp.SetValue(isOpt ? opt : arg, dlg);
-
-			//#warning ... FIX!
-			//throw new NotImplementedException();
-
-			//Option<int> zz;
-
-			//zz.DefaultValueFactory
-
-			//if(isOpt)
-			//	opt.def.valu.SetDefaultValue(c.DefVal);
-			//else
-			//	arg.SetDefaultValue(c.DefVal);
-
-			//if(isOpt)
-			//	opt.SetDefaultValue(c.DefVal);
-			//else
-			//	arg.SetDefaultValue(c.DefVal);
 		}
 
 		CmdProp prop = new(propTyp, isNullable, pi, c, opt, arg, defaultT);
@@ -309,13 +257,10 @@ public class CmdModelReflectionHelper
 		object value = method.Invoke(parseRes, [prm]);
 
 		if(value != null && propTyp.IsValueType && p.isNullable) {
-			//value = Convert.ChangeType(value, propTyp); // ??
-			// NOTE #0
 		}
 
-		bool hasDefVal = p.attr.DefVal != null; // CommandLineValueAttribute attr
+		bool hasDefVal = p.attr.DefVal != null;
 		if(!hasDefVal) {
-
 		}
 		else if(value == null || value.Equals(p.defaultOfTVal)) {
 			// --- IF NULL or DEFAULT ---
@@ -331,8 +276,6 @@ public class CmdModelReflectionHelper
 					aliases.Any(a => string.Equals(a, t.Value, StringComparison.OrdinalIgnoreCase)));
 				if(tknMatchCount < 1) // if(tkn == null) see bug below can't test!
 					value = p.attr.DefVal;  // token was NOT in input, so DO use DefVal
-
-				// NOTE #2
 			}
 		}
 
