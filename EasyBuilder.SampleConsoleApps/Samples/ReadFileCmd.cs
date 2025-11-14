@@ -2,14 +2,14 @@ using System.CommandLine;
 
 using CommandLine.EasyBuilder;
 
-namespace EasyBuilder.Samples.A;
+namespace EasyBuilder.Samples;
 
-public class ExampleApp_ReadCmd()
+public class ReadFileApp
 {
-	public RootCommand GetApp()
+	public static RootCommand Build()
 	{
 		RootCommand rootCmd = [];
-		rootCmd.AddAutoCommand<ReadCmd>();
+		rootCmd.AddAutoCommand<ReadFileCmd>();
 
 		Option<FileInfo> nameOpt = new Option<FileInfo>("--file")
 			.Alias("-f");
@@ -21,7 +21,7 @@ public class ExampleApp_ReadCmd()
 }
 
 [Command("read", "Read and display the file")]
-public class ReadCmd
+public class ReadFileCmd
 {
 	[Option("--delay", "-d", DefVal = 42.0, Description = "Delay between lines, specified as milliseconds per character in a line")]
 	public double? Delay { get; set; }

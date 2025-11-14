@@ -2,7 +2,11 @@ using System.CommandLine;
 
 namespace EasyBuilder.Samples;
 
-public class GetStartedTutorial_Original
+/// <summary>
+/// For comparison, this is the code from the original Get Started tutorial for System.CommandLine
+/// (with minor variations): https://learn.microsoft.com/en-us/dotnet/standard/commandline/get-started-tutorial
+/// </summary>
+public class GetStartedTutorialApp_Original
 {
 	public RootCommand Build()
 	{
@@ -61,7 +65,7 @@ public class GetStartedTutorial_Original
 				delayOption,
 				fgcolorOption,
 				lightModeOption
-		  };
+		};
 		quotesCommand.Subcommands.Add(readCommand);
 
 		Command deleteCommand = new("delete", "Delete lines from the file.");
@@ -75,20 +79,20 @@ public class GetStartedTutorial_Original
 		quotesCommand.Subcommands.Add(addCommand);
 
 		readCommand.SetAction(parseResult => ReadFile(
-			 parseResult.GetValue(fileOption),
-			 parseResult.GetValue(delayOption),
-			 parseResult.GetValue(fgcolorOption),
-			 parseResult.GetValue(lightModeOption)));
+			parseResult.GetValue(fileOption),
+			parseResult.GetValue(delayOption),
+			parseResult.GetValue(fgcolorOption),
+			parseResult.GetValue(lightModeOption)));
 
 		deleteCommand.SetAction(parseResult => DeleteFromFile(
-			 parseResult.GetValue(fileOption),
-			 parseResult.GetValue(searchTermsOption)));
+			parseResult.GetValue(fileOption),
+			parseResult.GetValue(searchTermsOption)));
 
 		addCommand.SetAction(parseResult => AddToFile(
-			 parseResult.GetValue(fileOption),
-			 parseResult.GetValue(quoteArgument),
-			 parseResult.GetValue(bylineArgument))
-			 );
+			parseResult.GetValue(fileOption),
+			parseResult.GetValue(quoteArgument),
+			parseResult.GetValue(bylineArgument))
+			);
 
 		return rootCommand;
 		//return rootCommand.Parse(args).Invoke();

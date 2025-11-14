@@ -4,16 +4,6 @@ using CommandLine.EasyBuilder;
 
 namespace EasyBuilder.Samples;
 
-public class ExampleApp_Person()
-{
-	public RootCommand GetApp()
-	{
-		RootCommand rootCmd = [];
-		rootCmd.AddAutoCommand<PersonCmd>();
-		return rootCmd;
-	}
-}
-
 [Command("person", "Coolio person...")]
 public class PersonCmd
 {

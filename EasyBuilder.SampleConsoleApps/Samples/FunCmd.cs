@@ -4,23 +4,23 @@ using CommandLine.EasyBuilder;
 
 namespace EasyBuilder.Samples;
 
-public class ExampleApp_Fun
+public class FunCmdApp
 {
-	public RootCommand GetApp()
+	public static RootCommand Build()
 	{
 		RootCommand rootCmd = new("Cool app!");
 
 		Command teachCmd = new("teach", "Ben Stein says teach this well");
 		rootCmd.Subcommands.Add(teachCmd);
 
-		teachCmd.AddAutoCommand<FunArgs>();
+		teachCmd.AddAutoCommand<FunCmd>();
 
 		return rootCmd;
 	}
 }
 
 [Command("fun", "Silly test type for dealing with default and nullable value types")]
-public class FunArgs
+public class FunCmd
 {
 	[Option("--name", "-n", DefVal = "Charlie")]
 	public string Name { get; set; }

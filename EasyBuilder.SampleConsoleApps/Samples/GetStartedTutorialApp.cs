@@ -8,9 +8,9 @@ using FileIO = System.IO.File;
 
 namespace EasyBuilder.Samples;
 
-public class GetStartedTutorial_Auto
+public class GetStartedTutorialApp
 {
-	public RootCommand GetApp()
+	public static RootCommand Build()
 	{
 		RootCommand rootCmd = new("Sample app for System.CommandLine");
 
@@ -26,7 +26,7 @@ public class GetStartedTutorial_Auto
 	}
 
 	/// <summary>Demonstrates how to modify auto constructed options / arguments</summary>
-	void ShowExtraOptions(Command readCmd)
+	static void ShowExtraOptions(Command readCmd)
 	{
 		readCmd.Options.First(o => o.Name == "--fgcolor").Alias("-fg");
 
