@@ -11,40 +11,38 @@ namespace CommandLine.EasyBuilder.Internal;
 /// </summary>
 public class CmdModelReflectionHelper
 {
-	public static CommandAttribute GetCommandAttribute<T>()
-		=> typeof(T).GetCustomAttributes(typeof(CommandAttribute), true).FirstOrDefault() as CommandAttribute;
+	public static CommandAttribute GetCommandAttribute(Type modelType)
+		=> modelType.GetCustomAttributes(typeof(CommandAttribute), true).FirstOrDefault() as CommandAttribute;
 
-	public static object SetHandleMethod(CmdModelInfo info)
+	/// <summary>
+	/// On input type, looks for and returns a method named 'Handle' or 'HandleAsync',
+	/// or null if none.
+	/// </summary>
+	/// <param name="modelType">Model type</param>
+	/// <returns></returns>
+	/// <exception cref="ArgumentException">Return type MUST be void or Task</exception>
+	public static (MethodInfo method, bool handleIsAsync) GetHandleMethod(Type modelType)
 	{
-		Type type = info.Type;
-
-		MethodInfo method = type.GetMethod("Handle");
+		MethodInfo method = modelType.GetMethod("Handle");
 		if(method == null) {
-			method = type.GetMethod("HandleAsync");
+			method = modelType.GetMethod("HandleAsync");
 			if(method == null)
-				return null;
+				return default;
 		}
 
+		// note: even if named 'HandleAsync', if return type if void, we still let it work (call it as non-async / like 'Handle') 
 		bool isVoidRetType = method.ReturnType == typeof(void);
 		bool isTaskRetType = !isVoidRetType && method.ReturnType == typeof(Task);
 
 		if(!isVoidRetType && !isTaskRetType)
 			throw new ArgumentException("Handle method must return void or Task");
 
-		info.SetHandle(method, !isVoidRetType);
-
-		var firstP = method.GetParameters().FirstOrDefault();
-		var firstPT = firstP?.ParameterType;
-
-		object _handle = null;
-		return _handle;
+		return (method, !isVoidRetType);
 	}
 
-	public static CmdModelInfo<T> GetCmdModelInfo<T>(bool throwIfNull = true) where T : class, new()
+	public static CmdModelInfo GetCmdModelInfo(Type modelCmdType, bool throwIfNull = true) //where T : class, new()
 	{
-		Type type = typeof(T);
-
-		PropertyInfo[] props = type.GetProperties() ?? [];
+		PropertyInfo[] props = modelCmdType.GetProperties() ?? [];
 
 		if(props == null) {
 			if(!throwIfNull)
@@ -54,21 +52,38 @@ public class CmdModelReflectionHelper
 
 		CmdProp[] ogroup = [.. props.Select(GetCmdProperties).Where(v => v != null)];
 
-		MethodInfo parseResultSetter = props.FirstOrDefault(p =>
-			p.PropertyType == typeof(ParseResult) &&
-			p.CanWrite &&
-			(p.Name == "ParseResult" || p.Name == "ParsedResult") &&
-			p.SetMethod != null &&
-			p.SetMethod.IsPublic)?.SetMethod;
+		MethodInfo parseResultSetter = GetParseResultPropertySetter(props);
 
-		CmdModelInfo<T> info = new() {
-			Type = type,
-			CommandAttr = GetCommandAttribute<T>(),
+		CommandAttribute cmdAttr = GetCommandAttribute(modelCmdType);
+
+		CmdModelInfo info = new() {
+			ModelType = modelCmdType,
+			CommandAttr = cmdAttr,
 			Props = ogroup,
 			ParseResultSetter = parseResultSetter
 		};
 
+		(MethodInfo method, bool handleIsAsync) = GetHandleMethod(modelCmdType);
+		if(method != null)
+			info.SetHandle(method, handleIsAsync);
+
+		Command cmd = info.GetCommand();
+
 		return info;
+	}
+
+
+
+	static MethodInfo GetParseResultPropertySetter(PropertyInfo[] props)
+	{
+		MethodInfo parseResultSetter = props.FirstOrDefault(p =>
+			p.PropertyType == typeof(ParseResult) &&
+			p.CanWrite &&
+			(p.Name == "ParseResult" || p.Name == "ParsedResult") &&
+			p.SetMethod != null)?.SetMethod;
+		// lets not demand Public. Many cases may want to keep private
+		// && p.SetMethod.IsPublic)
+		return parseResultSetter;
 	}
 
 	public static object TryGetOptionFromStaticMethod(PropertyInfo pi, bool isOption, Type assertExpectedType)
@@ -245,6 +260,18 @@ public class CmdModelReflectionHelper
 	/// <param name="parseRes"></param>
 	/// <param name="p"></param>
 	/// <param name="item"></param>
+	/// <remarks>
+	/// FUTURE WORK! --> We need to DETECT scenarios where a property can have a default
+	/// set directly on the model class property, and was not input. This is different from
+	/// default value, as that has the major benefit of telling the user. HOWEVER, it would be
+	/// great to allow our model / class based system **TO NOT OVERWRITE** a property value
+	/// set directly on the class (eg `public int Age { get; set; } = 22;`). CURRENTLY we walk
+	/// through each attribute property and set the values. Would be great to allow for above scenario
+	/// without overwriting above. ... hmmm ... could pry do this AT INIT time, create an instance of
+	/// model, and detect any that have a set value, and save that on CmdProp with `HasPreSetValue` or something.
+	/// THEN: if input value is default(TProp), 1 last check: to validate it wasn't actually input as default...
+	/// (that's difficult tho)
+	/// </remarks>
 	public static void SetVal(ParseResult parseRes, CmdProp p, object item)
 	{
 		string name = p.attr.Name;

@@ -14,33 +14,16 @@ public static class AutoBuilderFX
 	/// <param name="parentCmd"></param>
 	/// <returns>Returns new instance of `TAuto` just added to parent</returns>
 	public static Command AddAutoCommand<TAuto>(this Command parentCmd) where TAuto : class, new()
+		=> AddAuto(typeof(TAuto), parentCmd);
+
+	public static Command AddAutoCommand(this Command parentCmd, Type cmdType)
+		=> AddAuto(cmdType, parentCmd);
+
+	static Command AddAuto(Type cmdType, Command parentCmd) //where T : class, new()
 	{
-		Command cmd = AddAuto<TAuto>(parentCmd);
-		return cmd;
-	}
-
-	static Command AddAuto<T>(Command parentCmd) where T : class, new()
-	{
-		CmdModelInfo<T> model = CmdModelReflectionHelper.GetCmdModelInfo<T>();
-
-		CmdProp[] arr = model.Props;
-		CommandAttribute cmdAttr = model.CommandAttr;
-
-		Command cmd = new(name: cmdAttr.Name, description: cmdAttr.Description);
-		model.Cmd = cmd;
-
-		if(cmdAttr.Alias != null)
-			cmd.Alias(cmdAttr.Alias);
-
-		foreach(CmdProp p in arr)
-			p.AddToCmd(cmd);
-
+		CmdModelInfo model = CmdModelReflectionHelper.GetCmdModelInfo(cmdType);
+		Command cmd = model.Cmd;
 		parentCmd?.Subcommands.Add(cmd);
-
-		CmdModelReflectionHelper.SetHandleMethod(model);
-
-		model.SetCommandHandler();
-
 		return cmd;
 	}
 }
