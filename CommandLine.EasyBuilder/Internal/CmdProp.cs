@@ -3,9 +3,22 @@ using System.Reflection;
 
 namespace CommandLine.EasyBuilder.Internal;
 
-public record CmdProp(Type type, bool isNullable, PropertyInfo pi, CLPropertyAttribute attr, Option option, Argument argument, object defaultOfTVal)
+public record CmdProp(
+	Type type,
+	bool isNullable,
+	PropertyInfo pi,
+	CLPropertyAttribute attr,
+	Option option,
+	Argument argument,
+	object defaultOfTVal)
 {
 	public bool IsOption => option != null;
+
+	public bool IsArray { get; set; }
+
+	public bool IsNumberArray { get; set; }
+
+	public Type NumberArrayItemType { get; set; }
 
 	public bool IsNonNullableValueTypeAndValEqualsDefaultTButNotDefValue(object value)
 	{

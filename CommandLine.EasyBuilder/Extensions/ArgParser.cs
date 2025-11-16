@@ -1,69 +1,46 @@
-using System.CommandLine.Parsing;
+using System.Globalization;
+using System.Numerics;
 
 namespace CommandLine.EasyBuilder;
 
-/// <summary>
-/// Extensions on `ArgumentResult` for parsing array values etc.
-/// </summary>
 public static class ArgParser
 {
-	/// <summary>
-	/// Use in Option constructor set to `parseArgument`,
-	/// for parsing a string value that should be parsed as an
-	/// integer array.
-	/// </summary>
-	/// <param name="arg">Arg</param>
-	public static int[] IntArray(this ArgumentResult arg)
-		=> ArrayParser(arg, str => int.TryParse(str, out int val) ? (int?)val : null);
-
-	public static double[] DoubleArray(this ArgumentResult arg)
-		=> ArrayParser(arg, str => double.TryParse(str, out double val) ? (double?)val : null);
-
-	public static double[] DoubleArray(string val, out string error)
-		=> ArrayParser(val, str => double.TryParse(str, out double val) ? (double?)val : null, out error);
-
-	public static long[] LongArray(this ArgumentResult arg)
-		=> ArrayParser(arg, str => long.TryParse(str, out long val) ? (long?)val : null);
-
-	public static decimal[] DecimalArray(this ArgumentResult arg)
-		=> ArrayParser(arg, str => decimal.TryParse(str, out decimal val) ? (decimal?)val : null);
-
-	public static T[] ArrayParser<T>(this ArgumentResult arg, Func<string, T?> conv) where T : struct
+	public static T[] ParseNumberArray<T>(string input) where T : INumber<T>
 	{
-		string str = arg.Tokens.Single().Value; //?.Trim();
-		T[] res = ArrayParser<T>(arg.Tokens.Single().Value, conv, out string err);
-		if(err != null)
-			arg.AddError(err); //.ErrorMessage = err;
-		return res;
+		if(!TryParseNumberArray<T>(input, out T[] values))
+			throw new ArgumentException("Invalid number array");
+		return values;
 	}
 
-	public static T[] ArrayParser<T>(string str, Func<string, T?> conv, out string error) where T : struct
+	/// <summary>
+	/// Trys to parse a string of comma-separated numbers of type T.
+	/// Null or empty is valid (returns true, with values = null). Trimming and
+	/// empty entries are ignored.
+	/// </summary>
+	/// <typeparam name="T">Number type</typeparam>
+	/// <param name="input">Input string</param>
+	/// <param name="values">T[] values</param>
+	/// <returns>True if null or whitespace or if all items parsed. False if any invalid parses</returns>
+	public static bool TryParseNumberArray<T>(string input, out T[] values)
+		where T : INumber<T>
 	{
-		error = null;
+		values = null;
+		if(string.IsNullOrWhiteSpace(input))
+			return true;
 
-		if(str == null)
-			return null;
+		var provider = CultureInfo.InvariantCulture; // Use invariant for consistent decimal separators
 
-		// It turns out "quotes" are already removed by input framework, so no use striping them
+		string[] parts = input.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+		T[] arr = new T[parts.Length];
 
-		if(str.Length > 1 && str[0] == '[')
-			str = str[1..^1];
-
-		string[] svals = str
-			.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-		T[] arr = new T[svals.Length];
-
-		for(int i = 0; i < svals.Length; i++) {
-			string s = svals[i];
-			T? val = conv(s);
-			if(val == null) {
-				error = $"Value is out of range or invalid: {s}";
-				return null;
-			}
-			arr[i] = val.Value;
+		for(int i = 0; i < parts.Length; i++) {
+			string part = parts[i];
+			if(!T.TryParse(part, provider, out T val))
+				return false;
+			arr[i] = val;
 		}
 
-		return arr;
+		values = arr;
+		return true;
 	}
 }

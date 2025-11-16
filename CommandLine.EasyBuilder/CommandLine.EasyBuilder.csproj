@@ -5,7 +5,7 @@
     <!-- keeping net8.0, as the bran new (2025-11-11) System.CommandLine 2.0.0, despite released on day of net10.0 launch, has net8.0 dep -->
     <TargetFramework>net8.0</TargetFramework>
     <VersionPrefix>2.0.0</VersionPrefix>
-    <VersionSuffix>rc1.2</VersionSuffix>
+    <VersionSuffix>rc1.3</VersionSuffix>
     <!-- OR: <Version>1.10-beta1.0</Version> -->
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
@@ -28,10 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!--<ProjectReference Include="..\..\CommandLine\command-line-api-vcool\System.CommandLine\System.CommandLine.csproj" />-->
     <PackageReference Include="System.CommandLine" Version="2.0.0" />
+    <!--<ProjectReference Include="..\..\CommandLine\command-line-api-vcool\System.CommandLine\System.CommandLine.csproj" />-->
   </ItemGroup>
 
 </Project>
-
-<!-- OLD! <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />-->

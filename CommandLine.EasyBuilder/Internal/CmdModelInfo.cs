@@ -75,7 +75,7 @@ public class CmdModelInfo
 		var props = Props;
 		for(int i = 0; i < props.Length; i++) {
 			CmdProp apg = props[i];
-			CmdModelReflectionHelper.SetVal(parseRes, apg, cmdModel);
+			SetPropValue.SetVal(parseRes, apg, cmdModel);
 		}
 
 		if(HasParseResultProp)
