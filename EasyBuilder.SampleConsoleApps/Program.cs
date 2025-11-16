@@ -10,15 +10,16 @@ class Program
 {
 	public static async Task<int> Main(string[] args)
 	{
-		SampleAppKind kind = SampleAppKind.HelloWorld;
+		string cmdln = args.IsNulle() ? "-h" : args[0]; // simplifies for demo to single cmd line arg
 
-		RootCommand rootCmd = GetSampleApp(kind, args);
-		string cmdln = args.IsNulle() ? "-h" : args[0];
-
-		if(args.IsNulle())
-			cmdln = "-h";
-
+		RootCommand rootCmd = null;
 		do {
+			if(rootCmd == null || ResetKind) {
+				rootCmd = GetSampleApp(Kind, args);
+				cmdln ??= "-h";
+				ResetKind = false;
+			}
+
 			if(cmdln.IsNulle()) {
 				Write(">> ");
 				cmdln = ReadLine();
@@ -49,29 +50,38 @@ class Program
 			_ => null,
 		};
 
-		if(root is not null)
-			return root;
+		if(root is null) {
+			root = new("Command line is cool");
 
-		root = new("Command line is cool");
-
-		switch(kind) {
-			case SampleAppKind.HelloWorld:
-				root.AddAutoCommand<HellowWorldCmd>(); break;
-			case SampleAppKind.Person:
-				root.AddAutoCommand<PersonCmd>(); break;
-			default:
-				throw new ArgumentOutOfRangeException();
+			switch(kind) {
+				case SampleAppKind.HelloWorld:
+					root.AddAutoCommand<HelloWorldCmd>(); break;
+				case SampleAppKind.NumberArrays:
+					root.AddAutoCommand<NumberArrayCmd>(); break;
+				case SampleAppKind.Person:
+					root.AddAutoCommand<PersonCmd>(); break;
+				default:
+					throw new ArgumentOutOfRangeException();
+			}
 		}
+
+		if(AllowChangeDemo)
+			root.AddAutoCommand<ChangeDemoAppCLIKindCmd>();
 		return root;
 	}
 
-	enum SampleAppKind
-	{
-		HelloWorld = 1,
-		ReadCmd = 2,
-		Person = 3,
-		Fun = 4,
-		GetStarted_Orig = 5,
-		GetStarted_Auto = 6,
-	};
+	public static SampleAppKind Kind = SampleAppKind.NumberArrays; //.HelloWorld;
+	public static bool ResetKind = false;
+	public static bool AllowChangeDemo = true;
 }
+
+public enum SampleAppKind
+{
+	HelloWorld,
+	ReadCmd,
+	Person,
+	Fun,
+	NumberArrays,
+	GetStarted_Orig,
+	GetStarted_Auto,
+};

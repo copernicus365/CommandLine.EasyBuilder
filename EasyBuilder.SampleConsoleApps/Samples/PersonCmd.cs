@@ -25,7 +25,11 @@ public class PersonCmd
 	[Option("--durations", "-durs", Description = "Person's age", Required = true)]
 	public string DurationsArg {
 		get => Durations.JoinToString(",");
-		set => Durations = ArgParser.DoubleArray(value, out string err);
+		set {
+			if(!ArgParser.TryParseNumberArray<double>(value, out var durs))
+				throw new ArgumentException("Invalid array");
+			Durations = durs; // ArgParser.TryParseNumberArray( .DoubleArray(value, out string err);
+		}
 	}
 
 	public double[] Durations { get; set; }

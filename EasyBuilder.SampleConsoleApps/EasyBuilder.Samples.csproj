@@ -29,16 +29,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!--<ProjectReference Include="..\..\CommandLine\command-line-api-vcool\System.CommandLine\System.CommandLine.csproj" />-->
-    <PackageReference Include="System.CommandLine" Version="2.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="sampleQuotes.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
-</Project>
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0" />
+    <!--<ProjectReference Include="..\..\CommandLine\command-line-api-vcool\System.CommandLine\System.CommandLine.csproj" />-->
+  </ItemGroup>
 
-<!-- OLD! <PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta2.21617.1" />-->
+</Project>
