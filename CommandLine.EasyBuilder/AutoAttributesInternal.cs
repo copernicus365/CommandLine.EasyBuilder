@@ -29,11 +29,12 @@ public abstract class CLPropertyAttribute : CLNameAttribute
 {
 	public CLPropertyAttribute() { }
 
-	public CLPropertyAttribute(string name, string alias = null, string description = null)
+	public CLPropertyAttribute(string name, string alias = null, string description = null, bool required = false)
 	{
 		Name = name;
 		Alias = alias;
 		Description = description;
+		Required = required;
 	}
 
 	public bool Required { get; set; }

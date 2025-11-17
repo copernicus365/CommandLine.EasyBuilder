@@ -68,14 +68,20 @@ public class CmdModelInfo
 	/// </summary>
 	/// <param name="parseRes">Input parse result.</param>
 	/// <returns>A newly created model instance.</returns>
-	public object GetModelInstanceAndPopulateValues(ParseResult parseRes)
+	public object GetModelInstanceAndPopulateValues(ParseResult parseRes, out bool error)
 	{
+		error = false;
 		object cmdModel = Activator.CreateInstance(ModelType);
 
 		var props = Props;
 		for(int i = 0; i < props.Length; i++) {
 			CmdProp apg = props[i];
-			SetPropValue.SetVal(parseRes, apg, cmdModel);
+			bool succ = SetPropValue.TrySetValue(parseRes, apg, cmdModel, out string errorMsg);
+			if(!succ) {
+				error = true;
+				Console.WriteLine(errorMsg ?? $"Error setting property '{apg.Prop.Name}'");
+				return null;
+			}
 		}
 
 		if(HasParseResultProp)
@@ -86,15 +92,15 @@ public class CmdModelInfo
 
 	public void CallHandleVoid(ParseResult r)
 	{
-		object item = GetModelInstanceAndPopulateValues(r);
-		if(HasHandle)
+		object item = GetModelInstanceAndPopulateValues(r, out bool error);
+		if(HasHandle && !error)
 			HandleMethod.Invoke(item, null);
 	}
 
 	public async Task CallHandleAsync(ParseResult r)
 	{
-		object item = GetModelInstanceAndPopulateValues(r);
-		if(HasHandle)
+		object item = GetModelInstanceAndPopulateValues(r, out bool error);
+		if(HasHandle && !error)
 			await (Task)HandleMethod.Invoke(item, null);
 	}
 

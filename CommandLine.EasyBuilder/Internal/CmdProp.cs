@@ -4,15 +4,16 @@ using System.Reflection;
 namespace CommandLine.EasyBuilder.Internal;
 
 public record CmdProp(
-	Type type,
-	bool isNullable,
-	PropertyInfo pi,
-	CLPropertyAttribute attr,
-	Option option,
-	Argument argument,
-	object defaultOfTVal)
+	Type PType,
+	bool IsNullable,
+	PropertyInfo Prop,
+	CLPropertyAttribute Attr,
+	Option Opt,
+	Argument Arg,
+	object DefVal,
+	object DefaultOfTVal)
 {
-	public bool IsOption => option != null;
+	public bool IsOption => Opt != null;
 
 	public bool IsArray { get; set; }
 
@@ -23,20 +24,20 @@ public record CmdProp(
 	public bool IsNonNullableValueTypeAndValEqualsDefaultTButNotDefValue(object value)
 	{
 		bool val =
-			type.IsValueType &&
-			!isNullable &&
-			attr.DefVal != null &&
+			PType.IsValueType &&
+			!IsNullable &&
+			DefVal != null &&
 			value != null &&
-			!value.Equals(attr.DefVal) &&
-			value.Equals(defaultOfTVal);
+			!value.Equals(DefVal) &&
+			value.Equals(DefaultOfTVal);
 		return val;
 	}
 
 	public void AddToCmd(Command cmd)
 	{
 		if(IsOption)
-			cmd.Options.Add(option);
-		else if(argument != null)
-			cmd.Arguments.Add(argument);
+			cmd.Options.Add(Opt);
+		else if(Arg != null)
+			cmd.Arguments.Add(Arg);
 	}
 }

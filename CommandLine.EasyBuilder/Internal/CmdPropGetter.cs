@@ -47,7 +47,7 @@ public class CmdPropGetter(PropertyInfo pi)
 
 		_SetDefPropSet();
 
-		CmdProp prop = new(propTyp, isNullable, pi, c, opt, arg, defaultT) {
+		CmdProp prop = new(propTyp, isNullable, pi, c, opt, arg, c.DefVal, defaultT) {
 			IsArray = isArray,
 			IsNumberArray = isNumberArray,
 			NumberArrayItemType = numberArrType,
@@ -121,7 +121,7 @@ public class CmdPropGetter(PropertyInfo pi)
 			c.Name = arg.Name;
 		}
 
-		prop1 = new(propTyp, isNullable, pi, c, opt, arg, defaultOfTVal: null);
+		prop1 = new(propTyp, isNullable, pi, c, opt, arg, c.DefVal, DefaultOfTVal: null);
 		return true;
 	}
 
