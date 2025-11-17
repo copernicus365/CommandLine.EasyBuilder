@@ -5,7 +5,7 @@ namespace EasyBuilder.Samples;
 [Command("demo-kind", "Change demo app CLI kind")]
 public class ChangeDemoAppCLIKindCmd
 {
-	[Argument("kind", Required = true)]
+	[Argument("kind", required: true)]
 	public SampleAppKind Kind { get; set; }
 
 	public void Handle()

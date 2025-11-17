@@ -7,7 +7,7 @@ namespace EasyBuilder.Samples;
 [Command("person", "Coolio person...")]
 public class PersonCmd
 {
-	[Option("--first-name", "-fn", Required = true, Description = "Person's first name")]
+	[Option("--first-name", "-fn", required: true, description: "Person's first name")]
 	public string FirstName { get; set; }
 
 	[Option("--last-name", "-ln", Required = true)]

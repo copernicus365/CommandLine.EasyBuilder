@@ -7,13 +7,13 @@ namespace EasyBuilder.Samples;
 [Command("hello", "Hello commandline world!")]
 public class HelloWorldCmd
 {
-	[Option("--name", "-n", Required = true)]
+	[Option("--name", "-n", required: true)]
 	public string Name { get; set; }
 
-	[Option(name: "--age")] //, DefVal = 42)]
+	[Option("--age")] //, DefVal = 42)]
 	public int Age { get; set; } = 12;
 
-	[Option("--animal", "-a", Required = true)]
+	[Option("--animal", "-a", required: true)]
 	public FavoriteAnimal FavAnimal { get; set; } = FavoriteAnimal.Cheetah;
 
 	public void Handle()

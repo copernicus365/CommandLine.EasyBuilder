@@ -25,22 +25,22 @@ public class FunCmd
 	[Option("--name", "-n", DefVal = "Charlie")]
 	public string Name { get; set; }
 
-	[Option(name: "--last-name", alias: "-ln", description: "Bogus last name", Required = true)]
+	[Option("--last-name", "-ln", required: true, description: "Bogus last name")]
 	public string LastName { get; set; }
 
-	[Option(name: "--pw", alias: "-p", Required = true)]
+	[Option("--pw", "-p", required: true)]
 	public string Pword { get; set; }
 
-	[Option(name: "--age", DefVal = 47)]
+	[Option("--age", DefVal = 47)]
 	public int Age { get; set; }
 
-	[Option(name: "--fav-num")]
+	[Option("--fav-num")]
 	public int? FavoriteNumber { get; set; }
 
 	[Option("--delay", "-d", DefVal = 4, Description = "Delay between lines, specified as milliseconds per character in a line")]
 	public int? Delay { get; set; }
 
-	[Option("--fun", "-f", Required = true)]
+	[Option("--fun", "-f", required: true)]
 	public FunnyType Fun { get; set; } // = FunnyType.Dry;
 
 	public ParseResult ParseResult { get; set; }
