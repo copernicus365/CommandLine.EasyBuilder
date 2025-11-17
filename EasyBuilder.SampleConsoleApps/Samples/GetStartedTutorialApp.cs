@@ -107,7 +107,7 @@ public class AddCmd : FileBase
 public class FileBase
 {
 	/// <summary>Enter "" for `name` (or `name: null`) to use static method for getting Option or Argument (see below)</summary>
-	[Option(name: null)]
+	[Option("")]
 	public FileInfo File { get; set; }
 
 	/// <summary>
