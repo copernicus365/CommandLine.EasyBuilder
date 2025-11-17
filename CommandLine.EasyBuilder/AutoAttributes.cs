@@ -9,7 +9,7 @@ public class CommandAttribute(string name, string description = null)
 { }
 
 /// <summary>Option attribute, with value.</summary>
-/// <param name="name">Name</param>
+/// <param name="name">Name. Null or empty to use static method for getting Option or Argument</param>
 /// <param name="alias">Alias</param>
 /// <param name="description">Description</param>
 /// <param name="required">Is required</param>
