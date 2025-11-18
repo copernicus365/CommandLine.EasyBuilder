@@ -6,7 +6,7 @@ using static System.Console;
 
 using FileIO = System.IO.File;
 
-namespace EasyBuilder.Samples;
+namespace EasyBuilder.Samples.Tutorial;
 
 public class GetStartedTutorialApp
 {
@@ -25,15 +25,38 @@ public class GetStartedTutorialApp
 		return rootCmd;
 	}
 
-	/// <summary>Demonstrates how to modify auto constructed options / arguments</summary>
-	static void ShowExtraOptions(Command readCmd)
+	/// <summary>
+	/// For cases where you need to do extra setup beyond what the attributes provide
+	/// (as of course plenty of scenarios cannot be handled by an Attribute alone):
+	/// NOTE that `AddAutoCommand` returns the created <see cref="Command"/>, and from
+	/// there you can edit or alter it and its <see cref="Option"/>s or <see cref="Argument"/>s, eg:
+	/// `cmd.Options.First(o => o.Name == "--name") ... `.
+	/// <para />
+	/// Note that it is also possible via the EasyBuilder model class to
+	/// directly set a models properties to a full <see cref="Option{T}"/> or <see cref="Argument{T}"/>:
+	/// SEE example below: <see cref="FileBase.GetFileOption"/>. In short, make a static function named
+	/// `Get{PropName}`: eg `static Option<FileInfo> GetFile() => ...` (or named `GetFileOption` or `GetFileOpt`).
+	/// This allows one to fully control the instantiation of an Option{T} (or Argument{T}) at the start.
+	/// </summary>
+	static void ShowExtraOptions(Command cmd)
 	{
-		readCmd.Options.First(o => o.Name == "--fgcolor").Alias("-fg");
+		cmd.Options.First(o => o.Name == "--fgcolor").Alias("-fg");
 
-		// example if you need the fully generic typed version eg Option<T> ...
-		Option<bool> opt = readCmd.Options.First(o => o.Name == "--light-mode") as Option<bool>;
+		// or get the option var directly:
+		Option opt = cmd.Options.First(o => o.Name == "--light-mode");
 		opt.Alias("-lm");
 		//opt.Arity = new ArgumentArity(0, 2);
+		//opt.AcceptOnlyFromAmong(["a", "b"]); // not even sure proper example values, but you get the idea!
+
+		// Or get typed version, ex: CustomParser only editable on typed Option{T}:
+		Option<bool> optLM = opt as Option<bool>;
+
+		optLM.CustomParser = result => {
+			if(result.Tokens.Count == 0)
+				return true; // default to true if no arg given
+			string val = result.Tokens.Single().Value.ToLowerInvariant();
+			return val is "1" or "true" or "yes" or "on";
+		};
 	}
 }
 

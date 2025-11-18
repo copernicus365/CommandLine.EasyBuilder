@@ -2,6 +2,8 @@ using System.CommandLine;
 
 using CommandLine.EasyBuilder;
 
+using EasyBuilder.Samples.Tutorial;
+
 using static System.Console;
 
 namespace EasyBuilder.Samples;
@@ -43,10 +45,10 @@ class Program
 	static RootCommand GetSampleApp(SampleAppKind kind, string[] args)
 	{
 		RootCommand root = kind switch {
-			SampleAppKind.ReadCmd => ReadFileApp.Build(),
 			SampleAppKind.Fun => FunCmdApp.Build(),
-			SampleAppKind.GetStarted_Auto => GetStartedTutorialApp.Build(),
-			SampleAppKind.GetStarted_Orig => new GetStartedTutorialApp_Original().Build(),
+			SampleAppKind.ReadFile => ReadFileApp.Build(),
+			SampleAppKind.GetStarted => GetStartedTutorialApp.Build(),
+			SampleAppKind.GetStartedOrig => new GetStartedTutorialApp_Original().Build(),
 			_ => null,
 		};
 
@@ -54,9 +56,9 @@ class Program
 			root = new("Command line is cool");
 
 			switch(kind) {
-				case SampleAppKind.HelloWorld:
+				case SampleAppKind.Hello:
 					root.AddAutoCommand<HelloWorldCmd>(); break;
-				case SampleAppKind.NumberArrays:
+				case SampleAppKind.NumArrays:
 					root.AddAutoCommand<NumberArrayCmd>(); break;
 				case SampleAppKind.Person:
 					root.AddAutoCommand<PersonCmd>(); break;
@@ -66,22 +68,22 @@ class Program
 		}
 
 		if(AllowChangeDemo)
-			root.AddAutoCommand<ChangeDemoAppCLIKindCmd>();
+			root.AddAutoCommand<DemoAppCmd>();
 		return root;
 	}
 
-	public static SampleAppKind Kind = SampleAppKind.NumberArrays; //.HelloWorld;
+	public static SampleAppKind Kind = SampleAppKind.NumArrays; //.HelloWorld;
 	public static bool ResetKind = false;
 	public static bool AllowChangeDemo = true;
 }
 
 public enum SampleAppKind
 {
-	HelloWorld,
-	ReadCmd,
+	Hello,
+	ReadFile,
 	Person,
 	Fun,
-	NumberArrays,
-	GetStarted_Orig,
-	GetStarted_Auto,
+	NumArrays,
+	GetStarted,
+	GetStartedOrig,
 };

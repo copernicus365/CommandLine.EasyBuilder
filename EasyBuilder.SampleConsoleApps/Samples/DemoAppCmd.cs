@@ -2,8 +2,8 @@ using CommandLine.EasyBuilder;
 
 namespace EasyBuilder.Samples;
 
-[Command("demo-kind", "Change demo app CLI kind")]
-public class ChangeDemoAppCLIKindCmd
+[Command("demo", "Change demo app CLI kind")]
+public class DemoAppCmd
 {
 	[Argument("kind", required: true)]
 	public SampleAppKind Kind { get; set; }

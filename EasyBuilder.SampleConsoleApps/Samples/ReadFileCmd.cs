@@ -20,7 +20,7 @@ public class ReadFileApp
 	}
 }
 
-[Command("read", "Read and display the file")]
+[Command("read-file", "Read and display the file")]
 public class ReadFileCmd
 {
 	[Option("--delay", "-d", DefVal = 42.0, Description = "Delay between lines, specified as milliseconds per character in a line")]

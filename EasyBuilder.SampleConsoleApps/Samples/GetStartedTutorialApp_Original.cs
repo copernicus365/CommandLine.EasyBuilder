@@ -1,6 +1,6 @@
 using System.CommandLine;
 
-namespace EasyBuilder.Samples;
+namespace EasyBuilder.Samples.Tutorial;
 
 /// <summary>
 /// For comparison, this is the code from the original Get Started tutorial for System.CommandLine
