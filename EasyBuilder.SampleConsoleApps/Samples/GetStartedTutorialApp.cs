@@ -2,8 +2,6 @@ using System.CommandLine;
 
 using CommandLine.EasyBuilder;
 
-using static System.Console;
-
 using FileIO = System.IO.File;
 
 namespace EasyBuilder.Samples.Tutorial;

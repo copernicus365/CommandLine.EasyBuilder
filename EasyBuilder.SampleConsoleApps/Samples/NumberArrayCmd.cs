@@ -12,5 +12,5 @@ public class NumberArrayCmd
 	public double[] Delays { get; set; }
 
 	public void Handle()
-		=> Console.WriteLine($"Hello {Name}: {Delays?.JoinToString(",")}");
+		=> WriteLine($"Hello {Name}: {Delays?.JoinToString(",")}");
 }

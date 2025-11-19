@@ -35,5 +35,5 @@ public class PersonCmd
 	public double[] Durations { get; set; }
 
 	public void Handle()
-		=> Console.WriteLine($"Person: {FirstName} {LastName}, Age: {Age}, FavNum: {FavNumber}, Durs: {Durations?.JoinToString(",")}");
+		=> WriteLine($"Person: {FirstName} {LastName}, Age: {Age}, FavNum: {FavNumber}, Durs: {Durations?.JoinToString(",")}");
 }

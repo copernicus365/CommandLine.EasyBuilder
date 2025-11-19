@@ -104,7 +104,7 @@ public class CmdModelInfo
 	}
 
 	/// <summary>
-	/// Set once at initialization time, set's <see cref="Cmd"/>'s
+	/// Set once at initialization time, sets <see cref="Cmd"/>'s
 	/// <see cref="Command.SetAction(Action{ParseResult})"/> (or etc overload) action
 	/// handler to:
 	/// 1) make an instance of the model as well as set its properties
@@ -146,6 +146,38 @@ public class CmdModelInfo
 
 		foreach(CmdProp p in Props)
 			p.AddToCmd(Cmd);
+
+		SetCommandActionToHandler();
+		return Cmd;
+	}
+
+	/// <summary>
+	/// Sets model and so forth onto an EXISTING Command instance (often: RootCommand
+	/// is where it's needed).
+	/// </summary>
+	public Command SetCommand(Command cmd)
+	{
+		ArgumentNullException.ThrowIfNull(cmd);
+
+		var c = Cmd = cmd;
+		CommandAttribute attr = CommandAttr;
+
+		// c.Name = attr.Name; // immutable, ... we could demand Name match, but how to handle nulle?
+
+		// On first principled look, it would seem best to keep the originally set description if had one
+		// but I've found in practise, it's easy to have a RootCommand with a generic description for
+		// many scenarios... Maybe seems less principled, but otoh: we ARE intending to set the command
+		// to this given instance
+		// So DO overwrite Command.Description according to the model Command's Description if exists
+		if(attr.Description != null) // c.Description == null && 
+			c.Description = attr.Description;
+
+		// if attr has alias: ONLY ADD if Cmd had NO aliases set (not checking per name, just ANY set)
+		if(attr.Alias != null && (c.Aliases?.Count ?? 0) == 0)
+			c.Alias(attr.Alias);
+
+		foreach(CmdProp p in Props)
+			p.AddToCmd(c);
 
 		SetCommandActionToHandler();
 		return Cmd;

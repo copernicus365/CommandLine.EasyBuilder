@@ -38,15 +38,15 @@ public class ReadFileCmd
 	public async Task Handle()
 	{
 		if(Lightmode != null) {
-			Console.BackgroundColor = Lightmode.Value ? ConsoleColor.White : ConsoleColor.Black;
+			BackgroundColor = Lightmode.Value ? ConsoleColor.White : ConsoleColor.Black;
 		}
 		if(Foreground != default)
-			Console.ForegroundColor = Foreground;
+			ForegroundColor = Foreground;
 
 		List<string> lines = System.IO.File.ReadLines(File.FullName).ToList();
 
 		foreach(string line in lines) {
-			Console.WriteLine(line);
+			WriteLine(line);
 			await Task.Delay(TimeSpan.FromMilliseconds(Delay.Value * line.Length));
 		}
 	}

@@ -40,14 +40,14 @@ public class CmdModelReflectionHelper
 		return (method, !isVoidRetType);
 	}
 
-	public static CmdModelInfo GetCmdModelInfo(Type modelCmdType, bool throwIfNull = true) //where T : class, new()
+	public static CmdModelInfo GetCmdModelInfo(Type modelCmdType, Command cmd = null, bool throwIfNoProperties = true)
 	{
 		PropertyInfo[] props = modelCmdType.GetProperties() ?? [];
 
 		if(props == null) {
-			if(!throwIfNull)
+			if(!throwIfNoProperties)
 				return null;
-			throw new ArgumentException("Type if invalid, no attributes / properties found");
+			throw new ArgumentException("Type is invalid, no attributes / properties found");
 		}
 
 		CmdProp[] ogroup = [.. props.Select(CmdPropGetter.PropToCmpProp).Where(v => v != null)];
@@ -67,7 +67,10 @@ public class CmdModelReflectionHelper
 		if(method != null)
 			info.SetHandle(method, handleIsAsync);
 
-		Command cmd = info.GetCommand();
+		if(cmd == null)
+			cmd = info.GetCommand();
+		else
+			info.SetCommand(cmd);
 
 		return info;
 	}
