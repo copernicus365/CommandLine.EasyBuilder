@@ -18,7 +18,7 @@
     <PackageTags>System.CommandLine, simple, functional, builder</PackageTags>
     <PackageReleaseNotes />
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Description>Building upon `System.CommandLine`, `CommandLine.EasyBuilder` makes it easier than ever to make a command line app, offering view-model type of auto-binding input command-line options and arguments to the properties of a POCO class.</Description>
+    <Description>Building upon the terrific `System.CommandLine`, `CommandLine.EasyBuilder` makes it easier than ever to make a command line app, offering view-model type of auto-binding of command-line options and arguments to the properties of a POCO class.</Description>
     <NoWarn>1701;1702;1591;</NoWarn>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
