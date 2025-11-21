@@ -10,12 +10,17 @@ namespace EasyBuilder.Samples;
 
 class Program
 {
-	static bool RunSingleSimpleHelloWorldApp = false;
+	static bool RunSingleSimpleHelloWorldApp = true;
 
-	public static async Task<int> Main(string[] args)
+	/// <summary>
+	/// To instead run `ProgWithHostedDIServices.cs` minimal app,
+	/// `Main` must be renamed (temporarily or whatever).
+	/// </summary>
+	public static async Task<int> Main1(string[] args)
 	{
 		if(RunSingleSimpleHelloWorldApp) {
-			await HelloWorldApp.Run(args);
+			RootCommand root = HelloWorldApp.GetApp(false);
+			await SampleCLILoopRunner.Run(root, args);
 			return 0;
 		}
 

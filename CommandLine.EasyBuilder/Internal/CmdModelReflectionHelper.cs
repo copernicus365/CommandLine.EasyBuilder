@@ -50,6 +50,8 @@ public class CmdModelReflectionHelper
 			throw new ArgumentException("Type is invalid, no attributes / properties found");
 		}
 
+		bool hasCtorWithParams = ModelHasAnyConstructorsWithParameters(modelCmdType);
+
 		CmdProp[] ogroup = [.. props.Select(CmdPropGetter.PropToCmpProp).Where(v => v != null)];
 
 		MethodInfo parseResultSetter = GetParseResultPropertySetter(props);
@@ -58,9 +60,10 @@ public class CmdModelReflectionHelper
 
 		CmdModelInfo info = new() {
 			ModelType = modelCmdType,
+			ModelHasConstructorWithParameters = hasCtorWithParams,
 			CommandAttr = cmdAttr,
 			Props = ogroup,
-			ParseResultSetter = parseResultSetter
+			ParseResultSetter = parseResultSetter,
 		};
 
 		(MethodInfo method, bool handleIsAsync) = GetHandleMethod(modelCmdType);
@@ -75,7 +78,8 @@ public class CmdModelReflectionHelper
 		return info;
 	}
 
-
+	public static bool ModelHasAnyConstructorsWithParameters(Type modelType)
+		=> modelType.GetConstructors(BindingFlags.Public | BindingFlags.Instance).Any(ctor => ctor.GetParameters().Length > 0);
 
 	static MethodInfo GetParseResultPropertySetter(PropertyInfo[] props)
 	{

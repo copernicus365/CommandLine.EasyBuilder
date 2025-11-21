@@ -23,6 +23,8 @@ public class CmdModelInfo
 	/// <summary>The command (view) model type</summary>
 	public Type ModelType;
 
+	public bool ModelHasConstructorWithParameters;
+
 	public Command Cmd;
 
 	/// <summary>
@@ -50,6 +52,8 @@ public class CmdModelInfo
 
 	public bool HandleIsAsync;
 
+	public static Func<Type, object> GetModelWithDIInstance { get; set; }
+
 	public void SetHandle(MethodInfo mi, bool handleIsAsync)
 	{
 		HandleIsAsync = handleIsAsync;
@@ -59,6 +63,16 @@ public class CmdModelInfo
 	public MethodInfo ParseResultSetter { get; set; }
 
 	public bool HasParseResultProp => ParseResultSetter != null;
+
+	public object GetModelTypeInstance()
+	{
+		bool normalInstance = !ModelHasConstructorWithParameters || GetModelWithDIInstance == null;
+		if(normalInstance)
+			return Activator.CreateInstance(ModelType);
+
+		object model = GetModelWithDIInstance(ModelType);
+		return model;
+	}
 
 	/// <summary>
 	/// Creates an *instance* of the command model type, and sets it's properties
@@ -70,7 +84,7 @@ public class CmdModelInfo
 	public object GetModelInstanceAndPopulateValues(ParseResult parseRes, out bool error)
 	{
 		error = false;
-		object cmdModel = Activator.CreateInstance(ModelType);
+		object cmdModel = GetModelTypeInstance();
 
 		var props = Props;
 		for(int i = 0; i < props.Length; i++) {

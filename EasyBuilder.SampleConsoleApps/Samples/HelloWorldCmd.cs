@@ -34,30 +34,10 @@ public class HelloWorldApp
 		return rootCmd;
 	}
 
-	/// <summary>Simple full demonstration</summary>
-	public static async Task Run(string[] args = null)
+	public static async Task<int> Main1(string[] args)
 	{
-		RootCommand rootCmd = GetApp(makeSubcommand: false);
-
-		string cmdln = args.IsNulle() ? "-h" : args[0];
-		do {
-			if(cmdln.IsNulle()) {
-				Write(">> ");
-				cmdln = ReadLine();
-			}
-
-			ParseResult res = rootCmd.Parse(cmdln);
-			cmdln = null;
-
-			if(res.Errors.Any()) {
-				foreach(var err in res.Errors)
-					WriteLine($"Error: {err.Message}");
-				WriteLine();
-				continue;
-			}
-
-			await res.InvokeAsync();
-			WriteLine();
-		} while(true);
+		RootCommand root = GetApp(false);
+		await SampleCLILoopRunner.Run(root, args);
+		return 0;
 	}
 }

@@ -26,6 +26,9 @@
   <ItemGroup>
     <PackageReference Include="DotNetXtensions" Version="4.4.0" />
     <PackageReference Include="DotNetXtensions.Json" Version="3.5.0" />
+
+    <!-- Only added here for the sample app: `ProgWithHostedDIServices` -->
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="*" />
   </ItemGroup>
 
   <ItemGroup>
