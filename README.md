@@ -174,7 +174,7 @@ await BasicCLILoop.Run(rootCmd, args, doLoop: true);
 
 For `CoolSvc` example above, see [HelloDICmd.cs](EasyBuilder.SampleConsoleApps/Samples/HelloDICmd.cs)
 
-## Full GetStartedTutorialApp example
+## Auto-properties and default values
 
 Now picks up auto-property (/'default value') initializers! So either of the following ways sets a default value now:
 
