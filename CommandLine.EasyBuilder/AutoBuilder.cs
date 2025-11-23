@@ -4,7 +4,7 @@ using CommandLine.EasyBuilder.Internal;
 
 namespace CommandLine.EasyBuilder;
 
-public static class AutoBuilderFX
+public static class AutoBuilder
 {
 	/// <summary>
 	/// Makes an instance of `TAuto` as a child <see cref="Command"/> added to
@@ -13,7 +13,7 @@ public static class AutoBuilderFX
 	/// <typeparam name="TModel"></typeparam>
 	/// <param name="parentCmd"></param>
 	/// <returns>Returns new instance of `TAuto` just added to parent</returns>
-	public static Command AddAutoCommand<TModel>(this Command parentCmd) //where TModel : class, new()
+	public static Command AddAutoCommand<TModel>(this Command parentCmd)
 		=> AddAuto(typeof(TModel), parentCmd);
 
 	public static Command AddAutoCommand(this Command parentCmd, Type modelCmdType)
@@ -28,7 +28,7 @@ public static class AutoBuilderFX
 	}
 
 
-	public static Command SetAutoCommand<TModel>(this Command cmd) //where TModel : class, new()
+	public static Command SetAutoCommand<TModel>(this Command cmd)
 		=> SetAuto(typeof(TModel), cmd);
 
 

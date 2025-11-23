@@ -53,6 +53,7 @@ public class CmdModelInfo
 	public bool HandleIsAsync;
 
 	public static Func<Type, object> GetModelWithDIInstance { get; set; }
+	public static Func<Type, object> InstanceGetter => BuilderDI.ModelInstanceGetter;
 
 	public void SetHandle(MethodInfo mi, bool handleIsAsync)
 	{
@@ -66,11 +67,13 @@ public class CmdModelInfo
 
 	public object GetModelTypeInstance()
 	{
-		bool normalInstance = !ModelHasConstructorWithParameters || GetModelWithDIInstance == null;
+		var ig = InstanceGetter;
+
+		bool normalInstance = !ModelHasConstructorWithParameters || ig == null;
 		if(normalInstance)
 			return Activator.CreateInstance(ModelType);
 
-		object model = GetModelWithDIInstance(ModelType);
+		object model = ig(ModelType);
 		return model;
 	}
 

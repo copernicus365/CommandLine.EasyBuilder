@@ -4,7 +4,7 @@ using CommandLine.EasyBuilder;
 
 using Microsoft.Extensions.Logging;
 
-namespace EasyBuilder.Samples.WithServices;
+namespace EasyBuilder.Samples;
 
 [Command("hello", "Hello commandline world!")]
 public class HelloYallCmd(ICoolSvc coolSvc)

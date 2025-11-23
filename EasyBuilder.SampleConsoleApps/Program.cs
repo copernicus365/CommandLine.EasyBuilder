@@ -16,13 +16,11 @@ class Program
 	/// To instead run `ProgWithHostedDIServices.cs` minimal app,
 	/// `Main` must be renamed (temporarily or whatever).
 	/// </summary>
-	public static async Task<int> Main1(string[] args)
+	public static async Task<int> Main(string[] args)
 	{
-		if(RunSingleSimpleHelloWorldApp) {
-			RootCommand root = HelloWorldApp.GetApp(false);
-			await SampleCLILoopRunner.Run(root, args);
-			return 0;
-		}
+		// since this file has got long for demo purposes, for simplest case call (uses also `SampleCLILoopRunner`):
+		if(RunSingleSimpleHelloWorldApp)
+			return await HelloWorldApp.Main_Run(args);
 
 		string cmdln = args.IsNulle() ? "-h" : args[0]; // simplifies for demo to single cmd line arg
 

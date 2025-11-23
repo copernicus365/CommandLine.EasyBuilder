@@ -85,6 +85,7 @@ Add either a `void Handle` or `Task HandleAsync` method to your POCO class, and 
 
 ## Example output 1: Set on root command (not a subcommand)
 
+
 ```txt
 Description:
   Hello commandline world!
@@ -158,6 +159,10 @@ Options:
 Hello Joey (59), glad to see you love Cats!
 
 ```
+
+
+
+
 
 ## Full GetStartedTutorialApp example
 
