@@ -24,13 +24,21 @@ public class HelloWorldCmd
 	public FavoriteAnimal FavAnimal { get; set; } = FavoriteAnimal.Cheetah;
 
 	public void Handle()
-		=> Console.WriteLine($"Hello {Name} ({Age}), glad to see you love {FavAnimal}s!");
+		=> WriteLine($"Hello {Name} ({Age}), glad to see you love {FavAnimal}s!");
 }
 
 public enum FavoriteAnimal { None = 0, Dog = 1, Cat = 2, Cheetah = 3, Rhino = 4 }
 
 public class HelloWorldApp
 {
+	// rename `Main_Run` to `Main` to run as a standalone app
+	public static async Task<int> Main_Run(string[] args)
+	{
+		RootCommand root = GetApp(false);
+		await BasicCLILoop.Run(root, args, doLoop: true);
+		return 0;
+	}
+
 	public static RootCommand GetApp(bool makeSubcommand)
 	{
 		RootCommand rootCmd = new("Command line is cool");
@@ -39,35 +47,6 @@ public class HelloWorldApp
 		else
 			rootCmd.SetAutoCommand<HelloWorldCmd>();
 		return rootCmd;
-	}
-
-	/// <summary>Simple full demonstration</summary>
-	public static async Task Run(string[] args = null)
-	{
-		RootCommand rootCmd = GetApp(makeSubcommand: false);
-
-		// NOTE: Nothing beyond here is unique to this library...
-
-		string cmdln = args.IsNulle() ? "-h" : args[0];
-		do {
-			if(cmdln.IsNulle()) {
-				Write(">> ");
-				cmdln = ReadLine();
-			}
-
-			ParseResult res = rootCmd.Parse(cmdln);
-			cmdln = null;
-
-			if(res.Errors.Any()) {
-				foreach(var err in res.Errors)
-					WriteLine($"Error: {err.Message}");
-				WriteLine();
-				continue;
-			}
-
-			await res.InvokeAsync();
-			WriteLine();
-		} while(true);
 	}
 }
 ```
@@ -160,9 +139,34 @@ Hello Joey (59), glad to see you love Cats!
 
 ```
 
+## Model dependency injection
 
+Need some DI in your models? That's now possible. You can set the type to object getter in a single line (agnostic to any given DI system), via:
 
+`BuilderDI.ModelInstanceGetter = ...`
 
+Here's the top-level app example in samples project for example:
+
+```csharp
+using CommandLine.EasyBuilder;
+
+using EasyBuilder.Samples;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+// FOR TOP-LEVEL (non-Main) way w/Hosting. To use: UNCOMMENT CODE BODY below and rename `Main`
+
+var builder = Host.CreateApplicationBuilder(args);
+builder.Services.AddSingleton<ICoolSvc, CoolSvc>();
+
+var host = builder.Build();
+
+BuilderDI.ModelInstanceGetter = type => ActivatorUtilities.CreateInstance(host.Services, type);
+// or if BuilderDIX.cs added to proj: //host.Services.SetEasyBuilderDI();
+
+await HelloYallCmdApp.Run(args);
+```
 
 ## Full GetStartedTutorialApp example
 
