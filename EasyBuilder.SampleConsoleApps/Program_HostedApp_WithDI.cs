@@ -15,4 +15,6 @@ var host = builder.Build();
 BuilderDI.ModelInstanceGetter = type => ActivatorUtilities.CreateInstance(host.Services, type);
 // or if BuilderDIX.cs added to proj: //host.Services.SetEasyBuilderDI();
 
-await HelloYallCmdApp.Run(args);
+var rootCmd = HelloDIApp.GetApp();
+
+await BasicCLILoop.Run(rootCmd, args, doLoop: true);

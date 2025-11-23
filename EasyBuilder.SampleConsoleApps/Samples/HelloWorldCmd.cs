@@ -25,12 +25,8 @@ public enum FavoriteAnimal { None = 0, Dog = 1, Cat = 2, Cheetah = 3, Rhino = 4 
 public class HelloWorldApp
 {
 	// rename `Main_Run` to `Main` to run as a standalone app
-	public static async Task<int> Main_Run(string[] args)
-	{
-		RootCommand root = GetApp(false);
-		await BasicCLILoop.Run(root, args, doLoop: true);
-		return 0;
-	}
+	public static async Task Main_Run(string[] args)
+		=> await BasicCLILoop.Run(GetApp(false), args, doLoop: true);
 
 	public static RootCommand GetApp(bool makeSubcommand)
 	{

@@ -139,13 +139,15 @@ Hello Joey (59), glad to see you love Cats!
 
 ```
 
-## Model dependency injection
+## Model dependency injection and hosted 
 
-Need some DI in your models? That's now possible. You can set the type to object getter in a single line (agnostic to any given DI system), via:
+DI is now possible! You can set the type to model instance getter in a single line at startup (agnostic to any given DI system), ex:
 
-`BuilderDI.ModelInstanceGetter = ...`
+`BuilderDI.ModelInstanceGetter = type => ActivatorUtilities.CreateInstance(host.Services, type);`
 
-Here's the top-level app example in samples project for example:
+## Top-level app example + DI
+
+Here's the top-level app example in samples project:
 
 ```csharp
 using CommandLine.EasyBuilder;
@@ -165,8 +167,12 @@ var host = builder.Build();
 BuilderDI.ModelInstanceGetter = type => ActivatorUtilities.CreateInstance(host.Services, type);
 // or if BuilderDIX.cs added to proj: //host.Services.SetEasyBuilderDI();
 
-await HelloYallCmdApp.Run(args);
+var rootCmd = HelloDIApp.GetApp();
+
+await BasicCLILoop.Run(rootCmd, args, doLoop: true);
 ```
+
+For `CoolSvc` example above, see [HelloDICmd.cs]("EasyBuilder.SampleConsoleApps/Samples/HelloDICmd.cs")
 
 ## Full GetStartedTutorialApp example
 

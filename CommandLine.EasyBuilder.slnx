@@ -1,6 +1,5 @@
 <Solution>
   <Folder Name="/Project/">
-    <File Path="README-v1.md" />
     <File Path="README.md" />
   </Folder>
   <Project Path="../CommandLine/command-line-api-vcool/System.CommandLine/System.CommandLine.csproj" />

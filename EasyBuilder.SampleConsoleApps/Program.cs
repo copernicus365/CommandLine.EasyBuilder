@@ -13,14 +13,16 @@ class Program
 	static bool RunSingleSimpleHelloWorldApp = true;
 
 	/// <summary>
-	/// To instead run `ProgWithHostedDIServices.cs` minimal app,
+	/// To instead run `Program_HostedApp_WithDI.cs` minimal / top-level hosted app,
 	/// `Main` must be renamed (temporarily or whatever).
 	/// </summary>
-	public static async Task<int> Main(string[] args)
+	public static async Task Main__(string[] args)
 	{
-		// since this file has got long for demo purposes, for simplest case call (uses also `SampleCLILoopRunner`):
-		if(RunSingleSimpleHelloWorldApp)
-			return await HelloWorldApp.Main_Run(args);
+		// since this file has got long for demo purposes, for simplest case see:
+		if(RunSingleSimpleHelloWorldApp) {
+			await HelloWorldApp.Main_Run(args);
+			return;
+		}
 
 		string cmdln = args.IsNulle() ? "-h" : args[0]; // simplifies for demo to single cmd line arg
 
