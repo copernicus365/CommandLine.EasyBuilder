@@ -139,7 +139,7 @@ Hello Joey (59), glad to see you love Cats!
 
 ```
 
-## Model dependency injection and hosted 
+## Model dependency injection 
 
 DI is now possible! You can set the type to model instance getter in a single line at startup (agnostic to any given DI system), ex:
 
@@ -172,7 +172,7 @@ var rootCmd = HelloDIApp.GetApp();
 await BasicCLILoop.Run(rootCmd, args, doLoop: true);
 ```
 
-For `CoolSvc` example above, see [HelloDICmd.cs]("EasyBuilder.SampleConsoleApps/Samples/HelloDICmd.cs")
+For `CoolSvc` example above, see [HelloDICmd.cs](EasyBuilder.SampleConsoleApps/Samples/HelloDICmd.cs)
 
 ## Full GetStartedTutorialApp example
 
