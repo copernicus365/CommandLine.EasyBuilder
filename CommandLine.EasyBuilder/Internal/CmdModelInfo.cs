@@ -52,7 +52,6 @@ public class CmdModelInfo
 
 	public bool HandleIsAsync;
 
-	public static Func<Type, object> GetModelWithDIInstance { get; set; }
 	public static Func<Type, object> InstanceGetter => BuilderDI.ModelInstanceGetter;
 
 	public void SetHandle(MethodInfo mi, bool handleIsAsync)
@@ -65,17 +64,20 @@ public class CmdModelInfo
 
 	public bool HasParseResultProp => ParseResultSetter != null;
 
-	public object GetModelTypeInstance()
+	public object GetModelInstance() => GetModelTypeInstance(ModelType, ModelHasConstructorWithParameters);
+
+	public static object GetModelTypeInstance(Type modelType, bool hasConstructorWithParams)
 	{
 		var ig = InstanceGetter;
 
-		bool normalInstance = !ModelHasConstructorWithParameters || ig == null;
+		bool normalInstance = !hasConstructorWithParams || ig == null;
 		if(normalInstance)
-			return Activator.CreateInstance(ModelType);
+			return Activator.CreateInstance(modelType);
 
-		object model = ig(ModelType);
+		object model = ig(modelType);
 		return model;
 	}
+
 
 	/// <summary>
 	/// Creates an *instance* of the command model type, and sets it's properties
@@ -87,7 +89,7 @@ public class CmdModelInfo
 	public object GetModelInstanceAndPopulateValues(ParseResult parseRes, out bool error)
 	{
 		error = false;
-		object cmdModel = GetModelTypeInstance();
+		object cmdModel = GetModelInstance();
 
 		var props = Props;
 		for(int i = 0; i < props.Length; i++) {

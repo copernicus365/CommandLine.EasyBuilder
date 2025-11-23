@@ -10,8 +10,8 @@ public class HelloWorldCmd
 	[Option("--name", "-n", required: true)]
 	public string Name { get; set; }
 
-	[Option("--age")] //, DefVal = 42)]
-	public int Age { get; set; } = 12;
+	[Option("--age")]
+	public int Age { get; set; }
 
 	[Option("--animal", "-a", required: true)]
 	public FavoriteAnimal FavAnimal { get; set; } = FavoriteAnimal.Cheetah;

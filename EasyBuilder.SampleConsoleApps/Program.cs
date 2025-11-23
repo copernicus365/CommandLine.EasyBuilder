@@ -10,13 +10,14 @@ namespace EasyBuilder.Samples;
 
 class Program
 {
-	static bool RunSingleSimpleHelloWorldApp = true;
+	public static SampleAppKind Kind = SampleAppKind.AutoDefaultsFun; //.HelloWorld;
+	static bool RunSingleSimpleHelloWorldApp = false;
 
 	/// <summary>
 	/// To instead run `Program_HostedApp_WithDI.cs` minimal / top-level hosted app,
 	/// `Main` must be renamed (temporarily or whatever).
 	/// </summary>
-	public static async Task Main__(string[] args)
+	public static async Task Main(string[] args)
 	{
 		// since this file has got long for demo purposes, for simplest case see:
 		if(RunSingleSimpleHelloWorldApp) {
@@ -71,6 +72,7 @@ class Program
 					case SampleAppKind.Hello: root.SetAutoCommand<HelloWorldCmd>(); break;
 					case SampleAppKind.NumArrays: root.SetAutoCommand<NumberArrayCmd>(); break;
 					case SampleAppKind.Person: root.SetAutoCommand<PersonCmd>(); break;
+					case SampleAppKind.AutoDefaultsFun: root.SetAutoCommand<AutoDefaultsFunCmd>(); break;
 					default: throw new ArgumentOutOfRangeException();
 				}
 			}
@@ -80,6 +82,7 @@ class Program
 					case SampleAppKind.Hello: root.AddAutoCommand<HelloWorldCmd>(); break;
 					case SampleAppKind.NumArrays: root.AddAutoCommand<NumberArrayCmd>(); break;
 					case SampleAppKind.Person: root.AddAutoCommand<PersonCmd>(); break;
+					case SampleAppKind.AutoDefaultsFun: root.AddAutoCommand<AutoDefaultsFunCmd>(); break;
 					default: throw new ArgumentOutOfRangeException();
 				}
 			}
@@ -90,7 +93,6 @@ class Program
 		return root;
 	}
 
-	public static SampleAppKind Kind = SampleAppKind.NumArrays; //.HelloWorld;
 	public static bool ResetKind = false;
 	public static bool SampleAppsSetAsRoot = false;
 	public static bool AllowChangeDemo = true;
@@ -101,6 +103,7 @@ public enum SampleAppKind
 	Hello,
 	ReadFile,
 	Person,
+	AutoDefaultsFun,
 	Fun,
 	NumArrays,
 	GetStarted,

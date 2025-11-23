@@ -16,7 +16,7 @@ public class PersonCmd
 	[Option("--age", Description = "Person's age", DefVal = 55)]
 	public int Age { get; set; }
 
-	[Option("--fav-number", Description = "Person's age")]
+	[Option("--fav-number", Description = "Favorite number")]
 	public int FavNumber { get; set; } = 7;
 
 	[Option("--nada-n", Description = "Ignore...")]

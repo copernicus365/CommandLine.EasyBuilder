@@ -7,14 +7,14 @@ using Microsoft.Extensions.Hosting;
 
 // FOR TOP-LEVEL (non-Main) way w/Hosting. To use: UNCOMMENT CODE BODY below and rename `Main`
 
-var builder = Host.CreateApplicationBuilder(args);
-builder.Services.AddSingleton<ICoolSvc, CoolSvc>();
+//var builder = Host.CreateApplicationBuilder(args);
+//builder.Services.AddSingleton<ICoolSvc, CoolSvc>();
 
-var host = builder.Build();
+//var host = builder.Build();
 
-BuilderDI.ModelInstanceGetter = type => ActivatorUtilities.CreateInstance(host.Services, type);
-// or if BuilderDIX.cs added to proj: //host.Services.SetEasyBuilderDI();
+//BuilderDI.ModelInstanceGetter = type => ActivatorUtilities.CreateInstance(host.Services, type);
+//// or if BuilderDIX.cs added to proj: //host.Services.SetEasyBuilderDI();
 
-var rootCmd = HelloDIApp.GetApp();
+//var rootCmd = HelloDIApp.GetApp();
 
-await BasicCLILoop.Run(rootCmd, args, doLoop: true);
+//await BasicCLILoop.Run(rootCmd, args, doLoop: true);

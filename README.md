@@ -176,6 +176,22 @@ For `CoolSvc` example above, see [HelloDICmd.cs](EasyBuilder.SampleConsoleApps/S
 
 ## Full GetStartedTutorialApp example
 
+Now picks up auto-property (/'default value') initializers! So either of the following ways sets a default value now:
+
+```csharp
+[Option("--age", DefVal = 11)]
+public int Age1 { get; set; }
+```
+
+or
+
+```csharp
+[Option("--age")]
+public int Age2 { get; set; } = 22;
+```
+
+## Full GetStartedTutorialApp example
+
 Other examples are shown in the `EasyBuilder.SampleConsoleApps` app.
 
 But for a larger example, see `GetStartedTutorialSimple.cs` shown below. This takes the final app demonstrated in this `System.CommandLine` [getting started tutorial](https://learn.microsoft.com/en-us/dotnet/standard/commandline/get-started-tutorial), but instead builds it in the `CommandLine.EasyBuilder` style with POCO command classes. This example with inline comments can serve as documentation for a number of scenarios.

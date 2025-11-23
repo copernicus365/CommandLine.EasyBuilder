@@ -52,8 +52,6 @@ public class CmdModelReflectionHelper
 
 		bool hasCtorWithParams = ModelHasAnyConstructorsWithParameters(modelCmdType);
 
-		CmdProp[] ogroup = [.. props.Select(CmdPropGetter.PropToCmpProp).Where(v => v != null)];
-
 		MethodInfo parseResultSetter = GetParseResultPropertySetter(props);
 
 		CommandAttribute cmdAttr = GetCommandAttribute(modelCmdType);
@@ -62,9 +60,13 @@ public class CmdModelReflectionHelper
 			ModelType = modelCmdType,
 			ModelHasConstructorWithParameters = hasCtorWithParams,
 			CommandAttr = cmdAttr,
-			Props = ogroup,
 			ParseResultSetter = parseResultSetter,
 		};
+
+		object modelInst = info.GetModelInstance();
+
+		CmdProp[] cmdProps = [.. props.Select(pp => CmdPropGetter.PropToCmpProp(pp, modelInst)).Where(v => v != null)];
+		info.Props = cmdProps;
 
 		(MethodInfo method, bool handleIsAsync) = GetHandleMethod(modelCmdType);
 		if(method != null)
@@ -153,17 +155,5 @@ public class CmdModelReflectionHelper
 			|| typ == typeof(decimal))
 			return typ;
 		return null;
-	}
-
-	public static Delegate GetArgResFuncReturnsObjectVal(Type genericPropTyp, object val)
-	{
-		// thank you, GROK
-		// Build Func<ArgumentResult, T> (ArgumentResult arg) => (T)val (as a constant expression, ignoring the input)
-		Type funcType = typeof(Func<,>).MakeGenericType(typeof(ArgumentResult), genericPropTyp);
-		ParameterExpression param = Expression.Parameter(typeof(ArgumentResult)); //, "arg");
-		Expression body = Expression.Constant(val, genericPropTyp);
-		LambdaExpression lambdaExpr = Expression.Lambda(funcType, body, param);
-		Delegate constantFunc = lambdaExpr.Compile();
-		return constantFunc;
 	}
 }
