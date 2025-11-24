@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Project/">
     <File Path="README.md" />
+    <File Path="single-file-ex.cs" />
   </Folder>
   <Project Path="../CommandLine/command-line-api-vcool/System.CommandLine/System.CommandLine.csproj" />
   <Project Path="CommandLine.EasyBuilder\CommandLine.EasyBuilder.csproj" />
