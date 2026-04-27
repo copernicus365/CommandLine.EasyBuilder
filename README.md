@@ -1,5 +1,7 @@
 # CommandLine.EasyBuilder
 
+[![NuGet](https://img.shields.io/nuget/v/CommandLine.EasyBuilder.svg)](https://www.nuget.org/packages/CommandLine.EasyBuilder)
+
 Building upon the terrific `System.CommandLine`, `CommandLine.EasyBuilder` makes it easier than ever to make a command line app, offering view-model type of auto-binding of command-line options and arguments to the properties of a POCO class. Simply decorate a class with a `Command` attribute, and decorate any of its properties with `Option` or `Argument` attributes, and quite literally, `CommandLine.EasyBuilder` takes care of the rest! More often than not this can replace the need to manually wire up via the traditional way. This also makes your command-line much easier to understand, to edit and to alter, and so forth. It's basically declarative decorations on a class and it's properties, building on top of all the tremendous work that `System.CommandLine` already does.
 
 ## Simple Hello World example
