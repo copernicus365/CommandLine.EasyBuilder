@@ -37,7 +37,7 @@ public class HelloWorldApp
 	public static async Task<int> Main_Run(string[] args)
 	{
 		RootCommand root = GetApp(false);
-		await BasicCLILoop.Run(root, args, doLoop: true);
+		await BasicCLI.Run(root, args, interactive: true);
 		return 0;
 	}
 
@@ -171,7 +171,7 @@ BuilderDI.ModelInstanceGetter = type => ActivatorUtilities.CreateInstance(host.S
 
 var rootCmd = HelloDIApp.GetApp();
 
-await BasicCLILoop.Run(rootCmd, args, doLoop: true);
+await BasicCLI.Run(rootCmd, args, interactive: true);
 ```
 
 For `CoolSvc` example above, see [HelloDICmd.cs](EasyBuilder.SampleConsoleApps/Samples/HelloDICmd.cs)

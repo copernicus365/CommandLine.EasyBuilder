@@ -26,7 +26,7 @@ public class HelloWorldApp
 {
 	// rename `Main_Run` to `Main` to run as a standalone app
 	public static async Task Main_Run(string[] args)
-		=> await BasicCLILoop.Run(GetApp(false), args, doLoop: true);
+		=> await BasicCLI.Run(GetApp(false), args, interactive: true);
 
 	public static RootCommand GetApp(bool makeSubcommand)
 	{

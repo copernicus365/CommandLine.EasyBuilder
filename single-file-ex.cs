@@ -1,4 +1,4 @@
-#:package CommandLine.EasyBuilder@2.0.0-rc1.7
+#:package CommandLine.EasyBuilder@2.0.1
 
 using static System.Console;
 using System.CommandLine;
@@ -9,7 +9,7 @@ WriteLine("Single file .cs app CLI example (let's GO csharp!)");
 RootCommand rootCmd = new("Command line is cool");
 rootCmd.AddAutoCommand<HelloWorldCmd>();
 
-await BasicCLILoop.Run(rootCmd, args, doLoop: true);
+await BasicCLI.Run(rootCmd, args, interactive: true);
 
 
 [Command("hello", "Hello commandline world!")]
