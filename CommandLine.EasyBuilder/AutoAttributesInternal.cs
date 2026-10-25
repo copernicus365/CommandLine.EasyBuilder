@@ -49,12 +49,15 @@ public abstract class CLPropertyAttribute : CLNameAttribute
 	/// </summary>
 	public bool AllowMultipleArgumentsPerToken { get; set; }
 
-	// unfortunately we can't use int? for attribute, so will always ignore if both are set to 0 (default, = not set)
-	// if EITHER one is not zero, will use both
+	// an attribute can't take int?, so -1 (the default) means not set: neither set leaves System.CommandLine's
+	// own arity for the type; if one is set, the other unset reads as 0. MaxArity = 0 makes a flag that takes no value
 
-	/// <summary>Min arity value</summary>
-	public int MinArity { get; set; }
+	/// <summary>Min arity value; -1 (the default) is not set.</summary>
+	public int MinArity { get; set; } = -1;
 
-	/// <summary>Max arity value</summary>
-	public int MaxArity { get; set; }
+	/// <summary>
+	/// Max arity value; -1 (the default) is not set. 0 makes a flag that takes no value
+	/// (<c>--apply</c>, never <c>--apply false</c>), which only a <c>bool</c> or <c>bool?</c> property can be.
+	/// </summary>
+	public int MaxArity { get; set; } = -1;
 }

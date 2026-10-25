@@ -29,9 +29,9 @@ public static class BuilderFX
 
 	// --- DefaultValue ---
 
-	public static Option<T> DefaultValue<T>(this Option<T> opt, object? value)
+	public static Option<T> DefaultValue<T>(this Option<T> opt, object value)
 	{
-		opt.DefaultValueFactory = _ => (T)value!;
+		opt.DefaultValueFactory = _ => (T)value;
 		//opt.SetDefaultValue(value);
 		return opt;
 	}

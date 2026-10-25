@@ -192,6 +192,42 @@ or
 public int Age2 { get; set; } = 22;
 ```
 
+## Native AOT
+
+EasyBuilder binds without any reflection a native AOT build can't run, so an app published with `PublishAot` gets no trim or AOT warning from it, with nothing to root or suppress. Every property type System.CommandLine parses on its own is built in: `bool`, `byte`, `sbyte`, `short`, `ushort`, `int`, `uint`, `long`, `ulong`, `float`, `double`, `decimal`, `DateTime`, `DateTimeOffset`, `DateOnly`, `TimeOnly`, `TimeSpan` and `Guid`, each with its nullable form and its array, plus `string`, `FileInfo`, `DirectoryInfo`, `FileSystemInfo` and their arrays.
+
+Any other property type, your own enums included, takes one step in a chain, called before the command tree is built:
+
+```csharp
+AutoBuilder.RegisterTypes()
+	.AddEnum<FavoriteAnimal>()   // FavoriteAnimal, FavoriteAnimal? and FavoriteAnimal[]
+	.Add<Point>();               // exactly Point: Point? or Point[] is a step of its own
+```
+
+A type left out is refused when the tree is built, with a message naming the step to add. Registering does no harm in an app with dynamic code on, which binds any type without it, as before.
+
+Dynamic code is off in a native AOT build, and also under `dotnet run` for an app that sets `PublishAot`. A file-based app (`dotnet run app.cs`) sets it by default, so it follows native rules from its first run; add `#:property PublishAot=false` to one that never goes native.
+
+## Flags that take no value
+
+A `bool` option takes a `true` or `false` after it, as in System.CommandLine, so `--apply false` reads as false. `MaxArity = 0` declares a flag that takes no value: `--apply` sets it, and `--apply false` is refused (or the `false` goes to a catch-all argument).
+
+```csharp
+[Option("--apply", "-a", "Apply the plan", MaxArity = 0)]
+public bool Apply { get; set; }
+```
+
+`MinArity` and `MaxArity` default to -1, meaning not set: with neither set, System.CommandLine's own arity for the type applies, and with one set, the other reads as 0. A flag that takes no value has to be a `bool` or `bool?`, and can't default to `true`.
+
+## `RunOnce` and parser settings
+
+`BasicCLI.RunOnce` parses the arguments exactly as the shell passed them, so a value with quotes or spaces arrives intact; with no arguments it runs `-h`. `Run` in REPL mode takes its first command from the arguments the same way. All three of `RunOnce`, `Run` and `RunRepl` take System.CommandLine's `ParserConfiguration` as an optional last parameter, for instance to keep a value that starts with `@` as text rather than read it as a response file:
+
+```csharp
+ParserConfiguration config = new() { ResponseFileTokenReplacer = null };
+return await BasicCLI.RunOnce(rootCmd, args, parserConfig: config);
+```
+
 ## Full GetStartedTutorialApp example
 
 Other examples are shown in the `EasyBuilder.SampleConsoleApps` app.
