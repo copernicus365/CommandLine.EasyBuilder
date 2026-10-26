@@ -1,10 +1,13 @@
-#:package CommandLine.EasyBuilder@2.0.1
+#:package CommandLine.EasyBuilder@3.0.0
 
 using static System.Console;
 using System.CommandLine;
 using CommandLine.EasyBuilder;
 
 WriteLine("Single file .cs app CLI example (let's GO csharp!)");
+
+// a file-based app runs with dynamic code off (PublishAot is on by default), so its own types register first
+AutoBuilder.RegisterTypes().AddEnum<FavoriteAnimal>();
 
 RootCommand rootCmd = new("Command line is cool");
 rootCmd.AddAutoCommand<HelloWorldCmd>();
