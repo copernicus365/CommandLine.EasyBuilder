@@ -18,19 +18,32 @@ namespace CommandLine.EasyBuilder;
 public static class BasicCLI
 {
 	/// <summary>
-	/// One-shot. Parses <paramref name="args"/> as a single command, runs it, returns
-	/// the System.CommandLine exit code. Empty <paramref name="args"/> falls back to
-	/// <paramref name="noArgsDefaultCmd"/> (default: <c>-h</c>, i.e. show help).
+	/// One-shot. Parses <paramref name="args"/> as a single command, exactly as given (never joined and
+	/// re-split), runs it, returns the System.CommandLine exit code. Empty <paramref name="args"/> falls back
+	/// to <paramref name="noArgsDefaultCmd"/> (default: <c>-h</c>, i.e. show help), parsed as a command line.
+	/// <paramref name="parserConfig"/>, if given, sets the parser's options, eg
+	/// <c>new ParserConfiguration { ResponseFileTokenReplacer = null }</c> so a value starting with <c>@</c>
+	/// stays text rather than naming a response file.
 	/// </summary>
 	public static async Task<int> RunOnce(
 		RootCommand rootCmd,
 		string[] args,
-		string noArgsDefaultCmd = "-h")
+		string noArgsDefaultCmd = "-h",
+		ParserConfiguration parserConfig = null)
 	{
+#if EASYBUILDER_LEGACY
+		// pre-array way, kept until parsing the args as given has run in the wild: the args joined, then re-split
 		string cmdln = (args == null || args.Length == 0)
 			? noArgsDefaultCmd
 			: JoinArgs(args);
-		return await ExecuteAsync(rootCmd, cmdln);
+		return await ExecuteAsync(rootCmd, cmdln, parserConfig);
+#else
+		if(args == null || args.Length == 0)
+			return await ExecuteAsync(rootCmd, noArgsDefaultCmd, parserConfig);
+
+		ParseResult res = rootCmd.Parse(args, parserConfig);
+		return await ExecuteAsync(res);
+#endif
 	}
 
 	/// <summary>
@@ -39,11 +52,13 @@ public static class BasicCLI
 	/// Ctrl+D on Unix). Empty input just re-prompts.
 	/// Optional <paramref name="initialCmd"/> runs once before the first prompt
 	/// (handy for showing help on entry: pass <c>"-h"</c>).
+	/// <paramref name="parserConfig"/>, if given, sets the parser's options for every line.
 	/// </summary>
 	public static async Task RunRepl(
 		RootCommand rootCmd,
 		string initialCmd = null,
-		string prompt = ">> ")
+		string prompt = ">> ",
+		ParserConfiguration parserConfig = null)
 	{
 		string cmdln = initialCmd?.Trim();
 		while(true) {
@@ -56,7 +71,7 @@ public static class BasicCLI
 			if(IsExit(cmdln)) break;
 
 			if(!string.IsNullOrEmpty(cmdln)) {
-				await ExecuteAsync(rootCmd, cmdln);
+				await ExecuteAsync(rootCmd, cmdln, parserConfig);
 				WriteLine();
 			}
 			cmdln = null;
@@ -82,24 +97,49 @@ public static class BasicCLI
 	/// to add the conventional short form, or <c>[]</c> to disable flag-based detection
 	/// (auto-detect then only fires on no-args).
 	/// </param>
+	/// <param name="parserConfig">
+	/// Parser options for every command parsed, one-shot or REPL, eg <c>ResponseFileTokenReplacer = null</c>
+	/// so a value starting with <c>@</c> stays text. In REPL mode the first command comes from
+	/// <paramref name="args"/> as given, never joined and re-split.
+	/// </param>
 	public static async Task Run(
 		RootCommand rootCmd,
 		string[] args,
 		bool? interactive = null,
 		string noArgsDefaultCmd = "-h",
-		IEnumerable<string> replFlags = null)
+		IEnumerable<string> replFlags = null,
+		ParserConfiguration parserConfig = null)
 	{
 		(string[] cmdArgs, bool autoInteractive) = ParseReplFlags(args, replFlags);
 		bool effective = interactive ?? autoInteractive;
 
 		if(!effective) {
-			await RunOnce(rootCmd, cmdArgs, noArgsDefaultCmd);
+			await RunOnce(rootCmd, cmdArgs, noArgsDefaultCmd, parserConfig);
 			return;
 		}
+#if EASYBUILDER_LEGACY
+		// pre-array way, kept until parsing the args as given has run in the wild: the first REPL command re-split from the joined args
 		string initialCmd = cmdArgs.Length == 0
 			? noArgsDefaultCmd
 			: JoinArgs(cmdArgs);
-		await RunRepl(rootCmd, initialCmd);
+		await RunRepl(rootCmd, initialCmd, parserConfig: parserConfig);
+#else
+		if(cmdArgs.Length == 0) {
+			await RunRepl(rootCmd, noArgsDefaultCmd, parserConfig: parserConfig);
+			return;
+		}
+
+		// an exit word as the whole first command ends the REPL before it starts, as RunRepl's initialCmd does
+		if(cmdArgs.Length == 1 && IsExit(cmdArgs[0]))
+			return;
+
+		// the first command comes from the args as given, so its values are never re-split
+		ParseResult res = rootCmd.Parse(cmdArgs, parserConfig);
+		await ExecuteAsync(res);
+		WriteLine();
+
+		await RunRepl(rootCmd, parserConfig: parserConfig);
+#endif
 	}
 
 	/// <summary>
@@ -132,11 +172,16 @@ public static class BasicCLI
 		return (cmdArgs, flagPresent || cmdArgs.Length == 0);
 	}
 
-	static async Task<int> ExecuteAsync(RootCommand rootCmd, string cmdln)
+	static async Task<int> ExecuteAsync(RootCommand rootCmd, string cmdln, ParserConfiguration parserConfig)
 	{
 		if(string.IsNullOrWhiteSpace(cmdln)) return 0;
 
-		ParseResult res = rootCmd.Parse(cmdln);
+		ParseResult res = rootCmd.Parse(cmdln, parserConfig);
+		return await ExecuteAsync(res);
+	}
+
+	static async Task<int> ExecuteAsync(ParseResult res)
+	{
 		if(res.Errors.Any()) {
 			foreach(var err in res.Errors)
 				WriteLine($"Error: {err.Message}");
@@ -149,6 +194,7 @@ public static class BasicCLI
 	static bool IsExit(string s)
 		=> s == "exit" || s == "quit" || s == ":q" || s == ":exit";
 
+#if EASYBUILDER_LEGACY
 	/// <summary>
 	/// Joins a string[] back into a single command-line string, quoting any element
 	/// that contains whitespace or quotes so System.CommandLine's tokenizer recovers
@@ -172,4 +218,5 @@ public static class BasicCLI
 		}
 		return sb.ToString();
 	}
+#endif
 }

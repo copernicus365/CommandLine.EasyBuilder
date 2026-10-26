@@ -43,7 +43,13 @@ internal class SetPropValue
 			return false;
 		}
 
+#if EASYBUILDER_LEGACY
+		// pre-AOT way, kept until the typed binders have run in the wild: GetValue<T> by name, through MakeGenericMethod
 		object value = GetValueFromArgName(parseRes, name, p.PType);
+#else
+		Symbol symbol = p.IsOption ? p.Opt : p.Arg;
+		object value = p.Binder.GetValue(parseRes, symbol);
+#endif
 
 		bool hasDefVal = p.DefVal != null;
 		if(!hasDefVal)
@@ -117,6 +123,7 @@ internal class SetPropValue
 			: (false, null, $"Error: Unable to parse numeric array argument '{name}'"); // with value '{value}'
 	}
 
+#if EASYBUILDER_LEGACY
 	static object GetValueFromArgName(ParseResult parseRes, string name, Type propTyp)
 	{
 		// >> get value via attr-name
@@ -125,5 +132,6 @@ internal class SetPropValue
 		object value = method.Invoke(parseRes, [name]);
 		return value;
 	}
+#endif
 }
 

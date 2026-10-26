@@ -21,6 +21,12 @@ public record CmdProp(
 
 	public Type NumberArrayItemType { get; set; }
 
+	/// <summary>
+	/// The binder for <see cref="PType"/>, which made the option or argument and reads its value
+	/// (null in a build with EASYBUILDER_LEGACY, whose old way reads it by reflection).
+	/// </summary>
+	public IPropTypeBinder Binder { get; set; }
+
 	public bool IsNonNullableValueTypeAndValEqualsDefaultTButNotDefValue(object value)
 	{
 		bool val =

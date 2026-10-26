@@ -1,4 +1,5 @@
 using System.CommandLine;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace CommandLine.EasyBuilder.Internal;
@@ -21,6 +22,7 @@ namespace CommandLine.EasyBuilder.Internal;
 public class CmdModelInfo
 {
 	/// <summary>The command (view) model type</summary>
+	[DynamicallyAccessedMembers(CmdModelReflectionHelper.ModelMembers)]
 	public Type ModelType;
 
 	public bool ModelHasConstructorWithParameters;
@@ -66,7 +68,7 @@ public class CmdModelInfo
 
 	public object GetModelInstance() => GetModelTypeInstance(ModelType, ModelHasConstructorWithParameters);
 
-	public static object GetModelTypeInstance(Type modelType, bool hasConstructorWithParams)
+	public static object GetModelTypeInstance([DynamicallyAccessedMembers(CmdModelReflectionHelper.ModelMembers)] Type modelType, bool hasConstructorWithParams)
 	{
 		var ig = InstanceGetter;
 
@@ -85,6 +87,7 @@ public class CmdModelInfo
 	/// is triggered (called via <see cref="SetCommandActionToHandler"/> below)
 	/// </summary>
 	/// <param name="parseRes">Input parse result.</param>
+	/// <param name="error">True if a property couldn't be set; its error has been written to the console.</param>
 	/// <returns>A newly created model instance.</returns>
 	public object GetModelInstanceAndPopulateValues(ParseResult parseRes, out bool error)
 	{
